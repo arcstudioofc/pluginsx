@@ -1,0 +1,18 @@
+target/
+important.md
+prompt.md
+
+# Ignore log files
+*.log
+
+# Ignore environment variable files
+.env
+
+# Ignore coverage reports
+coverage/*
+
+# Ignore temporary files
+*.tmp
+
+# Ignore OS generated files
+.DS_Store

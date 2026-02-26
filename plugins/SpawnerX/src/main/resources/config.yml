@@ -1,0 +1,254 @@
+#   _____                                   __   __
+#  / ____|                                  \ \ / /
+# | (___  _ __   __ ___      ___ __   ___ _ _\ V /
+#  \___ \| '_ \ / _` \ \ /\ / / '_ \ / _ \ '__> <
+#  ____) | |_) | (_| |\ V  V /| | | |  __/ | / . \
+# |_____/| .__/ \__,_| \_/\_/ |_| |_|\___|_|/_/ \_\
+#        | |
+#        |_|
+#
+# Arquivo de configuração do Plugin Spawner Break and Explosion System
+# Versão: 2.0.0
+# Por: Israel R. Jatobá (https://yeytaken.vercel.app)
+# ------------------------------------------------------
+# Idioma: Português (pt_BR)
+# Idiomas disponíveis:
+#  - English (en_US)
+#  - Português (pt_BR)
+# ------------------------------------------------------
+# Esta configuração controla:
+# 1. Sistema de Quebra - ferramentas, drops e silk touch
+# 2. Sistema de Explosão - comportamento ao destruir spawners
+# 3. Sistema de Spawner - stack, exibição e lore
+# 4. Sistema de Raridade - define a raridade dos mobs
+
+locale: pt_BR
+
+# ------------------------------------------------------
+# Sistema de Licença
+# ------------------------------------------------------
+license:
+  key: "" # Chave da licença do plugin
+
+# ------------------------------------------------------
+# Sistema de Quebra
+# ------------------------------------------------------
+# Controla como os spawners são quebrados,
+# se silk touch funciona e as chances de drop.
+break:
+  tools: ["DIAMOND_PICKAXE", "NETHERITE_PICKAXE"] # Ferramentas permitidas
+  silk-touch: true # Silk Touch preserva o spawner
+  drop-to-inventory: true # Drop direto no inventário
+  drop-chance: 100.0 # Chance (%) de drop ao quebrar
+  allow-break-without-requirements: true # Permitir quebrar sem requisitos
+
+# ------------------------------------------------------
+# Sistema de Explosão
+# ------------------------------------------------------
+# Configura o comportamento quando um spawner
+# é destruído por explosões
+explosion:
+  allow-drop: true # Pode dropar ao explodir
+  drop-to-inventory: true # Drop direto no inventário
+  drop-chance: 50.0 # Chance (%) de drop
+
+# ------------------------------------------------------
+# Sistema de Trade de Spawners
+# ------------------------------------------------------
+trade:
+  enabled: true # Ativa/desativa o sistema de troca entre jogadores
+  invite-timeout-seconds: 30 # Tempo para expirar o convite
+  session-timeout-seconds: 120 # Tempo maximo para concluir uma trade ativa
+  countdown-seconds: 3 # Contagem regressiva apos dupla confirmacao
+  distance-check:
+    enabled: true # Exige que os dois jogadores estejam proximos para trocar
+    max-distance-blocks: 8 # Distancia maxima permitida entre os jogadores
+  logging:
+    enabled: true # Exibir logs de trade no console
+  gui:
+    filler-material: LIGHT_BLUE_STAINED_GLASS_PANE # Compat legado
+    divider-material: BLUE_STAINED_GLASS_PANE # Compat legado
+    theme:
+      base-filler-material: LIGHT_BLUE_STAINED_GLASS_PANE
+      frame-filler-material: CYAN_STAINED_GLASS_PANE
+      divider-material: BLUE_STAINED_GLASS_PANE
+      confirmed-filler-material: LIME_STAINED_GLASS_PANE
+      confirmed-divider-material: GREEN_STAINED_GLASS_PANE
+    widgets:
+      show-player-heads: true
+      show-distance-indicator: true
+      show-countdown-indicator: true
+  effects:
+    enabled: true
+    sound-volume: 0.85
+    particle-density: 0.8
+
+# ------------------------------------------------------
+# Configuração do Sistema de Spawner
+# ------------------------------------------------------
+spawner:
+  distance-active: 64 # Distância para ativar (padrão vanilla)
+  stacking-enabled: true # Permitir empilhamento
+  max-stack-size: 64 # Máximo por pilha
+  display-name: "&8[{rarity_color}&l{rarity}&8] &eSpawner de {type}"
+  lore:
+    - "&7Tipo: &f{type}"
+    - "&7Raridade: {rarity_color}{rarity}"
+    - "&7Quantidade: &e{stack_size}"
+
+  upgrade:
+    active: true # Ativa ou desativa completamente o sistema de upgrades
+
+    # IMPORTANTE:
+    # Spawners de níveis diferentes NÃO podem ser empilhados,
+    # mesmo que sejam do mesmo tipo de mob.
+    # O spawner do nível anterior é consumido no processo de upgrade
+
+    # Se true, o jogador precisa da permissão abaixo para realizar upgrades
+    require-permission: false
+    permission-node: "spawnerx.spawner.upgrade"
+
+
+    # Define como o bônus de spawn será aplicado:
+    #
+    # MULTIPLIER → Reduz o tempo entre os ciclos de spawn
+    # ADDITIVE   → Aumenta a quantidade de mobs gerados por ciclo
+    # HYBRID     → Combina os dois efeitos:
+    #              reduz o tempo entre ciclos E aumenta a quantidade por ciclo
+    #
+    # Observação:
+    # No modo HYBRID, o valor de "boost" será aplicado
+    # tanto na velocidade quanto na quantidade de spawn.
+    boost-type: HYBRID
+
+    levels:
+      COPPER:
+        level: 1
+        boost: 0.5
+        cost:
+          material: COPPER_BLOCK
+          amount: 8
+        display:
+          name-suffix: "&e&l ✦"
+          lore-line: "&7Nível: &eCobre &7| &aBônus: &f+50%"
+
+      IRON:
+        level: 2
+        boost: 1.5
+        cost:
+          material: IRON_BLOCK
+          amount: 8
+        display:
+          name-suffix: "&f&l ✦"
+          lore-line: "&7Nível: &fFerro &7| &aBônus: &f+150%"
+
+      GOLD:
+        level: 3
+        boost: 2.0
+        max-stack-size: 64
+        cost:
+          material: GOLD_BLOCK
+          amount: 8
+        display:
+          name-suffix: "&6&l ✦"
+          lore-line: "&7Nível: &6Ouro &7| &aBônus: &f+200%"
+
+      DIAMOND:
+        level: 4
+        boost: 3.0
+        cost:
+          material: DIAMOND_BLOCK
+          amount: 6
+        display:
+          name-suffix: "&b&l ✦"
+          lore-line: "&7Nível: &bDiamante &7| &aBônus: &f+300%"
+
+      EMERALD:
+        level: 5
+        boost: 6.0
+        max-stack-size: 64
+        cost:
+          material: EMERALD_BLOCK
+          amount: 6
+        display:
+          name-suffix: "&a&l ✦"
+          lore-line: "&7Nível: &aEsmeralda &7| &aBônus: &f+300%"
+
+      NETHERITE:
+        level: 6
+        boost: 8.0
+        max-stack-size: 32
+        cost:
+          material: NETHERITE_BLOCK
+          amount: 4
+        display:
+          name-suffix: "&5&l ✦"
+          lore-line: "&7Nível: &5Netherita &7| &aBônus: &f+400%"
+
+    # Define o nível máximo permitido globalmente.
+    # Mesmo que existam níveis acima configurados,
+    # o sistema bloqueará upgrades além deste valor.
+    max-level: 6
+
+
+
+# ------------------------------------------------------
+# Sistema de Raridades Customizável
+# O administrador pode criar, editar ou remover
+# qualquer raridade livremente.
+# ------------------------------------------------------
+
+rarity-settings:
+  # Nada impede o editor de criar:
+  # “Caótico”
+  # “Abissal”
+  # “Farmável demais”
+  # O que a criatividade permitir
+  common:
+    display-name: "Comum"
+    color: "&f"
+    tier: 1
+
+  uncommon:
+    display-name: "Incomum"
+    color: "&a"
+    tier: 2
+
+  rare:
+    display-name: "Raro"
+    color: "&9"
+    tier: 3
+
+  epic:
+    display-name: "Épico"
+    color: "&5"
+    tier: 4
+
+  legendary:
+    display-name: "Lendário"
+    color: "&6"
+    tier: 5
+
+  secret:
+    display-name: "Secreto"
+    color: "&c"
+    tier: 6
+
+mob-rarities:
+
+  CHICKEN: common
+
+  COW: uncommon
+  PIG: uncommon
+  SHEEP: uncommon
+
+  ZOMBIE: rare
+  SKELETON: rare
+
+  ENDERMAN: epic
+  BLAZE: epic
+
+  ZOMBIE_VILLAGER: legendary
+  IRON_GOLEM: legendary
+
+  DEFAULT: common

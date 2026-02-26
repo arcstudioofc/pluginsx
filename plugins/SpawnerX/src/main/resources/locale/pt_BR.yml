@@ -1,0 +1,235 @@
+# SpawnerX - Mensagens em Português (Brasil)
+
+prefix: "&8[&f&lSpawner&c&lX&8]&r"
+
+# Comandos
+commands:
+  reload:
+    success: "{prefix} &aConfiguração recarregada com sucesso!"
+    error: "{prefix} &cErro ao recarregar a configuração!"
+  help:
+    header: "&8&m          &r &eSpawnerX - Ajuda &8&m          "
+    reload: "&e/spawnerx reload &7- Recarrega a configuração"
+    license: "&e/spawnerx license key sua_key &7ou &e/spawnerx license status &7- Define a chave e consulta o status"
+    admin: "&e/spawnerx admin &7- Abre menu admin de spawners"
+    shop: "&e/spawnerx shop &7- Abre a loja de spawners"
+    sell: "&e/spawnerx sell xp <valor> <quantidade> &7ou &e/spawnerx sell stats [player] &7- Vender e consultar status"
+    trade: "&e/spawnerx trade <player|accept|deny> &7- Trocar spawners com outro jogador"
+    help: "&e/spawnerx help &7- Mostra esta ajuda"
+    footer: "&8&m                                    "
+  no-permission: "{prefix} &cVocê não tem permissão para usar este comando!"
+
+# Admin
+admin:
+  only-players: "{prefix} &cApenas jogadores podem usar /spawnerx admin."
+  menu:
+    give-success: "{prefix} &aVocê recebeu um spawner de &e{type} &ano nível &e{level}&a."
+    mobs:
+      title: "&8Admin Spawners &7(Mobs {page}/{pages})"
+      item-name: "&e{type}"
+      item-lore: "&7Clique para escolher o nível"
+    levels:
+      title: "&8Níveis: &e{type}"
+      item-name: "&6Nível {level}"
+      item-lore: "&7Clique para receber este spawner"
+    nav:
+      prev: "&ePágina anterior"
+      next: "&ePróxima página"
+      back: "&cVoltar para mobs"
+      page: "&7Página &e{page}&7/&e{pages}"
+
+# Licença
+license:
+  locked: "{prefix} &cPlugin bloqueado: licença inválida ou não validada."
+  allowed-commands: "{prefix} &7Comandos liberados: &e/spawnerx license key sua_key&7, &e/spawnerx license status &7e &e/spawnerx reload"
+  usage: "/spawnerx license key sua_key | /spawnerx license status"
+  saved: "{prefix} &aChave de licença salva com sucesso."
+  reload-required: "{prefix} &eExecute &f/spawnerx reload &epara validar a licença."
+  validating: "{prefix} &eValidando licença..."
+  valid: "{prefix} &aLicença válida. Plugin liberado."
+  invalid: "{prefix} &cLicença inválida. Plugin permanece bloqueado."
+  error: "{prefix} &cFalha ao validar a licença. Plugin permanece bloqueado."
+  admin-feedback: "{prefix} &aLicença validada com sucesso. Todas as funcionalidades estão ativas."
+  status:
+    valid: "{prefix} &aStatus da licença: &fVÁLIDA&a."
+    invalid: "{prefix} &cStatus da licença: &fINVÁLIDA&c."
+    validating: "{prefix} &eStatus da licença: &fVALIDANDO&e."
+
+# Sistema de Quebra
+break:
+  wrong-tool: "{prefix} &cVocê não está usando uma ferramenta válida para quebrar spawners!"
+  no-silk-touch: "{prefix} &cVocê precisa de &eToque Suave &cpara quebrar spawners!"
+  no-permission: "{prefix} &cVocê não tem permissão para quebrar spawners!"
+  success: "{prefix} &aVocê quebrou um spawner de &e{type}&a!"
+  success-no-req: "{prefix} &eVocê quebrou o spawner de &6{type} &esem cumprir os requisitos!"
+  fail-chance: "{prefix} &cO spawner de &e{type} &cquebrou em pedaços (falha na chance de drop)!"
+
+# Sistema de Explosão
+explosion:
+  destroyed: "{prefix} &cUm spawner de &e{type} &cfoi destruído por uma explosão!"
+
+# Sistema de Spawner
+spawner:
+  placed: "{prefix} &aVocê colocou um spawner de &e{type}&a!"
+  stacked: "{prefix} &aVocê empilhou um spawner de &e{type}! Total: &e{amount}"
+  lore:
+    info: "&7Informações"
+    type: "&7Tipo: &f{type}"
+    rarity: "&7Raridade: {rarity_color}{rarity}"
+    stack: "&7Stack: &e{amount}"
+    level: "&7Nível: &e{level}"
+
+upgrade:
+  only-spawnerx: "{prefix} &cVocê só pode evoluir spawners gerenciados pelo SpawnerX!"
+  stack-not-supported: "{prefix} &cVocê não pode evoluir spawners empilhados. Deixe o stack em 1."
+  no-permission: "{prefix} &cVocê não tem permissão para evoluir spawners!"
+  max-level: "{prefix} &eEste spawner já está no nível máximo (&f{level}&e)."
+  invalid-path: "{prefix} &cConfiguração de cadeia inválida. Não foi possível encontrar o próximo nível."
+  wrong-material: "{prefix} &cMaterial incorreto. Necessário: &e{required}&c. Em mãos: &e{provided}&c."
+  not-enough-material: "{prefix} &cMateriais insuficientes: &e{current}/{required} {material}&c."
+  success: "{prefix} &aSpawner de &e{type} &aevoluído para o nível &e{level}&a!"
+
+# Geral
+general:
+  invalid-usage: "{prefix} &cUso incorreto! Use: &e{usage}"
+
+# Trade
+trade:
+  usage: "/spawnerx trade <player|accept|deny>"
+  only-players: "{prefix} &cApenas jogadores podem usar este comando."
+  disabled: "{prefix} &cO sistema de trade esta desativado."
+  self-target: "{prefix} &cVoce nao pode enviar trade para si mesmo."
+  target-offline: "{prefix} &cO jogador &e{player} &cnao esta online."
+  too-far: "{prefix} &cOs jogadores devem estar a no maximo &e{distance} blocos &cde distancia."
+  sender-busy: "{prefix} &cVoce ja esta em uma trade ativa ou com convite pendente."
+  target-busy: "{prefix} &cO jogador &e{player} &cja esta em trade ou com convite pendente."
+  countdown: "{prefix} &eTrade confirmada! Executando em &f{seconds}&es..."
+  success: "{prefix} &aTrade concluida com sucesso com &e{player}&a."
+  session:
+    started: "{prefix} &aSessao de trade iniciada com &e{player}&a."
+  invite:
+    sent: "{prefix} &aConvite de trade enviado para &e{player}&a."
+    received: "{prefix} &e{player} &7quer trocar spawners com voce."
+    accept-button: "&a[ACEITAR]"
+    deny-button: "&c[RECUSAR]"
+    accept-hover: "&7Clique para aceitar a trade"
+    deny-hover: "&7Clique para recusar a trade"
+    none: "{prefix} &cVoce nao possui convite de trade pendente."
+    sender-offline: "{prefix} &cO jogador que enviou o convite ficou offline."
+    denied-target: "{prefix} &eVoce recusou o convite de &f{player}&e."
+    denied-sender: "{prefix} &c{player} recusou seu convite de trade."
+    expired-sender: "{prefix} &cSeu convite para &e{player} &cexpirou."
+    expired-target: "{prefix} &cO convite de &e{player} &cexpirou."
+  gui:
+    title: "&8Trade: &e{player_a} &7x &e{player_b}"
+    only-spawner: "{prefix} &cApenas spawners validos do SpawnerX podem ser trocados."
+    header:
+      left: "&bOferta de &f{player}"
+      right: "&bOferta de &f{player}"
+    emblem:
+      name: "&3Nucleo de Trade Ciano"
+    status:
+      waiting: "&eAGUARDANDO"
+      ready: "&aREADY"
+    countdown:
+      idle: "&7Aguardando dupla confirmacao"
+      running: "&bExecutando em &f{seconds}s"
+    distance:
+      label: "&bDistancia: &f{distance}&7/&f{max} blocos"
+      too-far: "&cMuito longe"
+      ok: "&aDentro do alcance"
+    confirm:
+      red-name: "&cConfirmacao de {player}"
+      red-lore: "&7Estado: &cNao confirmado\\n&7Clique para confirmar"
+      green-name: "&aConfirmacao de {player}"
+      green-lore: "&7Estado: &aConfirmado\\n&7Clique novamente para cancelar"
+  cancel:
+    closed: "{prefix} &cTrade cancelada: um jogador fechou o menu."
+    player-left: "{prefix} &cTrade cancelada: um jogador saiu do servidor."
+    unconfirmed: "{prefix} &cTrade cancelada: confirmacao foi desmarcada."
+    items-changed: "{prefix} &cTrade cancelada: itens foram alterados apos confirmacao."
+    too-far: "{prefix} &cTrade cancelada: os jogadores passaram de &e{distance} blocos &cde distancia."
+    timeout: "{prefix} &cTrade cancelada por tempo esgotado."
+    disabled: "{prefix} &cTrade cancelada: sistema desativado."
+    shutdown: "{prefix} &cTrade cancelada: servidor/plugin desligando."
+
+# Menu de Interação
+menu:
+  title: "&8Informações: &e{type}"
+  info-item:
+    name: "&eSpawner de {type}"
+    environment: "&7Ambiente: {status}"
+  status:
+    valid: "&aVálido"
+    invalid: "&cInválido"
+  dynamic:
+    title: "&eEstatísticas em Tempo Real"
+    spawn-tick: "&7Tick de spawn: &e{delay} ticks"
+    spawn-time: "&7Tempo entre spawns: &e{min}s - {max}s"
+    status: "&7Status: {status}"
+    status-active: "&aAtivo"
+    status-inactive: "&cInativo (Sem players)"
+    footer: "&8(Atualizando em tempo real)"
+  owner-item:
+    name: "&f{player}"
+    lore: "&7Este spawner foi colocado por."
+
+# Shop
+shop:
+  disabled: "{prefix} &cA loja de spawners está desativada!"
+  only-players: "{prefix} &cApenas jogadores podem usar este comando!"
+  title:
+    categories: "&8Loja de Spawners"
+    category: "&8{category} &7(Página {page}/{pages})"
+  category:
+    lore: "&7Clique para ver"
+  item:
+    name: "{display_name}"
+    lore: "&7Preço: &e{price} {currency}\\n&bClique para comprar"
+  nav:
+    prev: "&ePágina Anterior"
+    next: "&ePróxima Página"
+    back: "&eVoltar às Categorias"
+    page: "&7Página &e{page}&7/&e{pages}"
+  buy:
+    success: "{prefix} &aVocê comprou um spawner de &e{type} &apor &e{price} {currency}&a!"
+    not-enough-xp: "{prefix} &cVocê precisa de &e{price} {currency} &cpara comprar!"
+    invalid-item: "{prefix} &cItem de loja inválido!"
+  sell:
+    disabled: "{prefix} &cAs vendas públicas estão desativadas!"
+    no-item: "{prefix} &cVocê precisa segurar um spawner na mão principal."
+    only-spawner: "{prefix} &cApenas spawners gerenciados pelo SpawnerX podem ser anunciados."
+    invalid-price: "{prefix} &cInforme um preço válido maior que 0."
+    limit-reached: "{prefix} &cVocê atingiu o limite de &e{max} &canúncios ativos."
+    success: "{prefix} &aSpawner de &e{type} &aanunciado por &e{price} {currency}&a (itens: &e{amount}&a). Expira em &e{expires}&a."
+    expired-returned: "{prefix} &eSeu anúncio expirou e você recebeu de volta &f{name} &7x&e{items}&a."
+    expired-returned-login: "{prefix} &aVocê recebeu de volta &e{listings} &aanúncio(s) expirado(s) (&e{items} spawner(s)&a)."
+    stats:
+      header: "&8&m          &r &eStatus de Vendas: &f{player} &8&m          "
+      target-header: "&8&m          &r &eStatus de Vendas (Admin): &f{player} &8&m          "
+      active-listings: "{prefix} &7Anúncios ativos: &e{count}"
+      pending-xp: "{prefix} &7XP pendente: &e{amount} {currency}"
+      history-sold: "{prefix} &7Histórico vendido: &e{sales} anúncios&7, &e{items} itens&7, &e{xp} {currency}"
+      history-bought: "{prefix} &7Histórico comprado: &e{purchases} compras&7, &e{items} itens&7, &e{xp} {currency}"
+      own-removed: "{prefix} &7Auto-remoções de anúncio: &e{count}"
+      no-data: "{prefix} &cSem histórico de vendas para &e{player}&c."
+      target-not-found: "{prefix} &cJogador não encontrado: &e{player}"
+      usage: "/spawnerx sell xp <valor> <quantidade> | /spawnerx sell stats [player]"
+      no-permission-target: "{prefix} &cVocê não tem permissão para consultar stats de outros jogadores."
+  public:
+    disabled: "{prefix} &cAs vendas públicas estão desativadas!"
+    title: "&8Vendas Públicas &7(Página {page}/{pages})"
+    empty: "&cNenhum anúncio público disponível"
+    not-found: "{prefix} &cEsse anúncio não está mais disponível."
+    menu:
+      name: "&6Vendas Públicas"
+      lore: "&7Veja anúncios de outros jogadores\\n&bClique para abrir"
+    item:
+      name: "{display_name}"
+      lore: "&7Itens: &e{items}\\n&7Vendedor: &e{seller}\\n&7Preço: &e{price} {currency}\\n&7Stack: &e{stack}\\n&7Nível: &e{level}\\n&7Expira em: &e{expires}\\n&bClique para comprar"
+    buy:
+      success: "{prefix} &aVocê comprou &e{items}x {type} &ade &e{seller} &apor &e{price} {currency}&a!"
+      removed-own: "{prefix} &aVocê removeu seu anúncio de &e{items}x &f{name} &ado shop."
+  payout:
+    received-live: "{prefix} &aVocê recebeu &e{amount} {currency} &ade uma venda para &e{buyer}&a."
+    received-pending: "{prefix} &aVocê recebeu &e{amount} {currency} &ade vendas pendentes."

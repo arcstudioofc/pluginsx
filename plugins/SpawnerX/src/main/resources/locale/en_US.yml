@@ -1,0 +1,235 @@
+# SpawnerX - English (US) Messages
+
+prefix: "&8[&f&lSpawner&c&lX&8]&r"
+
+# Commands
+commands:
+  reload:
+    success: "{prefix} &aConfiguration reloaded successfully!"
+    error: "{prefix} &cError reloading configuration!"
+  help:
+    header: "&8&m          &r &eSpawnerX - Help &8&m          "
+    reload: "&e/spawnerx reload &7- Reloads the configuration"
+    license: "&e/spawnerx license key your_key &7or &e/spawnerx license status &7- Sets the key and checks status"
+    admin: "&e/spawnerx admin &7- Opens the admin spawner menu"
+    shop: "&e/spawnerx shop &7- Opens the spawner shop"
+    sell: "&e/spawnerx sell xp <price> <quantity> &7or &e/spawnerx sell stats [player] &7- List and inspect sales"
+    trade: "&e/spawnerx trade <player|accept|deny> &7- Trade spawners with another player"
+    help: "&e/spawnerx help &7- Shows this help"
+    footer: "&8&m                                    "
+  no-permission: "{prefix} &cYou do not have permission to use this command!"
+
+# Admin
+admin:
+  only-players: "{prefix} &cOnly players can use /spawnerx admin."
+  menu:
+    give-success: "{prefix} &aYou received a &e{type} &aspawner at level &e{level}&a."
+    mobs:
+      title: "&8Admin Spawners &7(Mobs {page}/{pages})"
+      item-name: "&e{type}"
+      item-lore: "&7Click to choose a level"
+    levels:
+      title: "&8Levels: &e{type}"
+      item-name: "&6Level {level}"
+      item-lore: "&7Click to receive this spawner"
+    nav:
+      prev: "&ePrevious page"
+      next: "&eNext page"
+      back: "&cBack to mobs"
+      page: "&7Page &e{page}&7/&e{pages}"
+
+# License
+license:
+  locked: "{prefix} &cPlugin locked: license is invalid or not validated."
+  allowed-commands: "{prefix} &7Allowed commands: &e/spawnerx license key your_key&7, &e/spawnerx license status &7and &e/spawnerx reload"
+  usage: "/spawnerx license key your_key | /spawnerx license status"
+  saved: "{prefix} &aLicense key saved."
+  reload-required: "{prefix} &eRun &f/spawnerx reload &eto validate the license."
+  validating: "{prefix} &eValidating license..."
+  valid: "{prefix} &aLicense validated. Plugin unlocked."
+  invalid: "{prefix} &cInvalid license. Plugin remains locked."
+  error: "{prefix} &cLicense validation failed. Plugin remains locked."
+  admin-feedback: "{prefix} &aLicense validated successfully. All plugin features are active."
+  status:
+    valid: "{prefix} &aLicense status: &fVALID&a."
+    invalid: "{prefix} &cLicense status: &fINVALID&c."
+    validating: "{prefix} &eLicense status: &fVALIDATING&e."
+
+# Break System
+break:
+  wrong-tool: "{prefix} &cYou need to use a &e{tool} &cto break spawners!"
+  no-silk-touch: "{prefix} &cYou need &eSilk Touch &cto break spawners!"
+  no-permission: "{prefix} &cYou do not have permission to break spawners!"
+  success: "{prefix} &aYou broke a &e{type} &aspawner!"
+  success-no-req: "{prefix} &eYou broke the &6{type} &espawner without meeting requirements!"
+  fail-chance: "{prefix} &cThe &e{type} &cspawner was destroyed during breaking!"
+
+# Explosion System
+explosion:
+  destroyed: "{prefix} &cA &e{type} &cspawner was destroyed by an explosion!"
+
+# Spawner System
+spawner:
+  placed: "{prefix} &aYou placed a &e{type} &aspawner!"
+  stacked: "{prefix} &aYou stacked a &e{type} &aspawner! Total: &e{amount}"
+  lore:
+    info: "&7Information"
+    type: "&7Type: &f{type}"
+    rarity: "&7Rarity: {rarity_color}{rarity}"
+    stack: "&7Stack: &e{amount}"
+    level: "&7Level: &e{level}"
+
+upgrade:
+  only-spawnerx: "{prefix} &cYou can only upgrade SpawnerX-managed spawners!"
+  stack-not-supported: "{prefix} &cYou cannot upgrade stacked spawners. Keep stack at 1."
+  no-permission: "{prefix} &cYou do not have permission to upgrade spawners!"
+  max-level: "{prefix} &eThis spawner is already at max level (&f{level}&e)."
+  invalid-path: "{prefix} &cInvalid upgrade chain configuration. Next level was not found."
+  wrong-material: "{prefix} &cWrong material. Required: &e{required}&c. Holding: &e{provided}&c."
+  not-enough-material: "{prefix} &cNot enough materials: &e{current}/{required} {material}&c."
+  success: "{prefix} &a{type} spawner upgraded to level &e{level}&a!"
+
+# General
+general:
+  invalid-usage: "{prefix} &cIncorrect usage! Use: &e{usage}"
+
+# Trade
+trade:
+  usage: "/spawnerx trade <player|accept|deny>"
+  only-players: "{prefix} &cOnly players can use this command."
+  disabled: "{prefix} &cThe trade system is currently disabled."
+  self-target: "{prefix} &cYou cannot send a trade request to yourself."
+  target-offline: "{prefix} &cPlayer &e{player} &cis not online."
+  too-far: "{prefix} &cPlayers must stay within &e{distance} blocks &cto trade."
+  sender-busy: "{prefix} &cYou are already in an active trade or pending invite."
+  target-busy: "{prefix} &cPlayer &e{player} &cis already in trade or has a pending invite."
+  countdown: "{prefix} &eTrade confirmed! Executing in &f{seconds}&es..."
+  success: "{prefix} &aTrade completed successfully with &e{player}&a."
+  session:
+    started: "{prefix} &aTrade session started with &e{player}&a."
+  invite:
+    sent: "{prefix} &aTrade request sent to &e{player}&a."
+    received: "{prefix} &e{player} &7wants to trade spawners with you."
+    accept-button: "&a[ACCEPT]"
+    deny-button: "&c[DENY]"
+    accept-hover: "&7Click to accept this trade"
+    deny-hover: "&7Click to deny this trade"
+    none: "{prefix} &cYou do not have a pending trade invite."
+    sender-offline: "{prefix} &cThe player who sent the invite is now offline."
+    denied-target: "{prefix} &eYou denied &f{player}&e's trade request."
+    denied-sender: "{prefix} &c{player} denied your trade request."
+    expired-sender: "{prefix} &cYour trade invite to &e{player} &cexpired."
+    expired-target: "{prefix} &cThe trade invite from &e{player} &cexpired."
+  gui:
+    title: "&8Trade: &e{player_a} &7x &e{player_b}"
+    only-spawner: "{prefix} &cOnly valid SpawnerX spawners can be traded."
+    header:
+      left: "&bOffer from &f{player}"
+      right: "&bOffer from &f{player}"
+    emblem:
+      name: "&3Cyan Trade Core"
+    status:
+      waiting: "&eWAITING"
+      ready: "&aREADY"
+    countdown:
+      idle: "&7Waiting for double confirmation"
+      running: "&bExecuting in &f{seconds}s"
+    distance:
+      label: "&bDistance: &f{distance}&7/&f{max} blocks"
+      too-far: "&cToo far"
+      ok: "&aWithin range"
+    confirm:
+      red-name: "&c{player} Confirmation"
+      red-lore: "&7State: &cNot confirmed\\n&7Click to confirm"
+      green-name: "&a{player} Confirmation"
+      green-lore: "&7State: &aConfirmed\\n&7Click again to cancel"
+  cancel:
+    closed: "{prefix} &cTrade cancelled: a player closed the menu."
+    player-left: "{prefix} &cTrade cancelled: a player left the server."
+    unconfirmed: "{prefix} &cTrade cancelled: a confirmation was reverted."
+    items-changed: "{prefix} &cTrade cancelled: items were changed after confirmation."
+    too-far: "{prefix} &cTrade cancelled: players moved farther than &e{distance} blocks&c."
+    timeout: "{prefix} &cTrade cancelled due to timeout."
+    disabled: "{prefix} &cTrade cancelled: system disabled."
+    shutdown: "{prefix} &cTrade cancelled: server/plugin shutting down."
+
+# Interaction Menu
+menu:
+  title: "&8Information: &e{type}"
+  info-item:
+    name: "&e{type} Spawner"
+    environment: "&7Environment: {status}"
+  status:
+    valid: "&aValid"
+    invalid: "&cInvalid"
+  dynamic:
+    title: "&eReal-Time Stats"
+    spawn-tick: "&7Spawn tick: &e{delay} ticks"
+    spawn-time: "&7Spawn interval: &e{min}s - {max}s"
+    status: "&7Status: {status}"
+    status-active: "&aActive"
+    status-inactive: "&cInactive (No players)"
+    footer: "&8(Updating in real time)"
+  owner-item:
+    name: "&f{player}"
+    lore: "&7This spawner was placed by."
+
+# Shop
+shop:
+  disabled: "{prefix} &cThe spawner shop is currently disabled!"
+  only-players: "{prefix} &cOnly players can use this command!"
+  title:
+    categories: "&8Spawner Shop"
+    category: "&8{category} &7(Page {page}/{pages})"
+  category:
+    lore: "&7Click to view"
+  item:
+    name: "{display_name}"
+    lore: "&7Price: &e{price} {currency}\\n&bClick to buy"
+  nav:
+    prev: "&ePrevious Page"
+    next: "&eNext Page"
+    back: "&eBack to Categories"
+    page: "&7Page &e{page}&7/&e{pages}"
+  buy:
+    success: "{prefix} &aYou bought a &e{type} &afor &e{price} {currency}&a!"
+    not-enough-xp: "{prefix} &cYou need &e{price} {currency} &cto buy this!"
+    invalid-item: "{prefix} &cInvalid shop item!"
+  sell:
+    disabled: "{prefix} &cPublic sales are currently disabled!"
+    no-item: "{prefix} &cYou must hold a spawner in your main hand."
+    only-spawner: "{prefix} &cOnly SpawnerX-managed spawners can be listed."
+    invalid-price: "{prefix} &cPlease provide a valid price greater than 0."
+    limit-reached: "{prefix} &cYou reached the limit of &e{max} &cactive listings."
+    success: "{prefix} &aListed &e{type} &afor &e{price} {currency}&a (items: &e{amount}&a). Expires in &e{expires}&a."
+    expired-returned: "{prefix} &eYour listing expired and &f{name} &7x&e{items} &awas returned to you."
+    expired-returned-login: "{prefix} &aYou received back &e{listings} &aexpired listing(s) (&e{items} spawner(s)&a)."
+    stats:
+      header: "&8&m          &r &eSales Status: &f{player} &8&m          "
+      target-header: "&8&m          &r &eSales Status (Admin): &f{player} &8&m          "
+      active-listings: "{prefix} &7Active listings: &e{count}"
+      pending-xp: "{prefix} &7Pending XP: &e{amount} {currency}"
+      history-sold: "{prefix} &7Total sold: &e{sales} listings&7, &e{items} items&7, &e{xp} {currency}"
+      history-bought: "{prefix} &7Total bought: &e{purchases} purchases&7, &e{items} items&7, &e{xp} {currency}"
+      own-removed: "{prefix} &7Own listings removed: &e{count}"
+      no-data: "{prefix} &cNo sales history found for &e{player}&c."
+      target-not-found: "{prefix} &cPlayer not found: &e{player}"
+      usage: "/spawnerx sell xp <price> <quantity> | /spawnerx sell stats [player]"
+      no-permission-target: "{prefix} &cYou do not have permission to inspect another player's stats."
+  public:
+    disabled: "{prefix} &cPublic sales are currently disabled!"
+    title: "&8Public Sales &7(Page {page}/{pages})"
+    empty: "&cNo public listings available"
+    not-found: "{prefix} &cThis listing is no longer available."
+    menu:
+      name: "&6Public Sales"
+      lore: "&7Browse player listings\\n&bClick to open"
+    item:
+      name: "{display_name}"
+      lore: "&7Items: &e{items}\\n&7Seller: &e{seller}\\n&7Price: &e{price} {currency}\\n&7Stack: &e{stack}\\n&7Level: &e{level}\\n&7Expires in: &e{expires}\\n&bClick to buy"
+    buy:
+      success: "{prefix} &aYou bought &e{items}x {type} &afrom &e{seller} &afor &e{price} {currency}&a!"
+      removed-own: "{prefix} &aYou removed your listing of &e{items}x &f{name} &afrom the shop."
+  payout:
+    received-live: "{prefix} &aYou received &e{amount} {currency} &afrom a sale to &e{buyer}&a."
+    received-pending: "{prefix} &aYou received &e{amount} {currency} &afrom pending sales."

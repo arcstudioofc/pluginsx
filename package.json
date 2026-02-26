@@ -1,0 +1,31 @@
+{
+  "name": "@pluginsx/root",
+  "version": "1.0.0",
+  "description": "Plugin PluginsX for Bukkit/Paper.",
+  "license": "ISC",
+  "scripts": {
+    "dev": "turbo dev --parallel",
+    "build": "turbo build --parallel && pnpm update:version"
+  },
+  "dependencies": {
+    "typescript": "catalog:",
+    "tsx": "catalog:",
+    "turbo": "^2.5.4"
+  },
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "keywords": [
+    ""
+  ],
+  "author": {
+    "name": "Israel R. Jatobá",
+    "email": "contact.israeljatoba@gmail.com",
+    "url": "https://yeytaken.vercel.app/en-us"
+  },
+  "packageManager": "pnpm@10.9.0",
+  "engines": {
+    "node": ">=24"
+  }
+}

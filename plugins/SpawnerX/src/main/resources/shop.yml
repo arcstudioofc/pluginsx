@@ -1,0 +1,133 @@
+#   _____                                   __   __
+#  / ____|                                  \ \ / /
+# | (___  _ __   __ ___      ___ __   ___ _ _\ V / 
+#  \___ \| '_ \ / _` \ \ /\ / / '_ \ / _ \ '__> <  
+#  ____) | |_) | (_| |\ V  V /| | | |  __/ | / . \ 
+# |_____/| .__/ \__,_| \_/\_/ |_| |_|\___|_|/_/ \_\
+#        | |                                       
+#        |_|                                       
+#
+# Configuration file for the Spawner Break and Explosion System Plugin
+# Version: 1.0.0
+# By: Israel R. Jatobá (https://yeytaken.vercel.app)
+# ------------------------------------------------------
+# This configuration handles:
+# 1. Shop - Shop settings for spawners, categories, items, prices
+
+# SpawnerX - Shop Configuration
+#
+# This file controls ONLY the spawner shop. All other settings remain in config.yml.
+#
+# HOW TO USE
+# 1) enabled: true/false to toggle the shop.
+# 2) currency: currently only "XP" (total points) is supported.
+# 3) navigation: visual items for arrows, fillers and title item.
+# 4) categories: define shop categories and their items (spawners).
+#
+# SLOT REFERENCE (0-53):
+# 0  1  2  3  4  5  6  7  8
+# 9 10 11 12 13 14 15 16 17
+# 18 19 20 21 22 23 24 25 26
+# 27 28 29 30 31 32 33 34 35
+# 36 37 38 39 40 41 42 43 44
+# 45 46 47 48 49 50 51 52 53
+#
+# Reserved slots:
+# - 45: previous page, 48: back, 49: page indicator, 53: next page, 4: title item.
+# Avoid using these slots for categories/items (it will fallback to auto placement).
+#
+# ICON PRIORITY:
+# - icon-head / head (base64) -> icon-material / material -> fallback (category = BOOK, item = spawner)
+#
+# BASE64 HEADS:
+# - Use the "Value" from minecraft-heads.com or mc-heads.com and paste it here.
+# - Keep it as a single line, inside quotes.
+
+spawner:
+  shop:
+    enabled: true                 # Enable/disable spawner shop
+    currency: XP                  # Only XP supported for now
+    public-sales:
+      enabled: true               # Enable/disable public sales market
+      max-active-per-player: 5    # Max active listings per player
+      expiration-hours: 48        # Listing expiration window
+      auto-cleanup-minutes: 5     # Cleanup task period
+      menu-slot: 40               # Slot of the public sales button in categories view
+    navigation:
+      prev-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM0ZjliZTNjYmVlYmQ3ZDJlYWY4YWRhYWY2Mzg3YmIyNmJkYmQ3MWFkNTI4NGJjZDFhNTYxMjVlN2MwMjIwNCJ9fX0=" # Left arrow head (base64)
+      next-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2UyMDIzY2QxNWNjZGUzNjEwMzg1ZDQzM2Y0ZTdmMTZhMzU2NzcxZDhmNDIwYTk4NmI5N2I3MTIxZDFlMWFlMyJ9fX0=" # Right arrow head (base64)
+      back-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ3NmU4ZTk5YzNkZGFhYTdlMDRmNzNhMjM3NjM0OTBkNjllZWVmMmU4NWEyZGVkMzU4OWNmODMzYmRmYzE4NyJ9fX0=" # Back arrow head (base64)
+      title-item: "COMPASS" # Item used in the top bar title slot
+      filler-primary: "LIGHT_GRAY_STAINED_GLASS_PANE"
+      filler-secondary: "WHITE_STAINED_GLASS_PANE"
+      filler-accent: "QUARTZ_BLOCK"
+      # Tip: use GLASS_PANE for clean UI or QUARTZ/SEA_LANTERN for accents.
+    categories:
+      # Category key is an ID (not displayed). Title is the visible name.
+      FARM:
+        title: "&7Farm Spawners"
+        icon-material: "HAY_BLOCK"
+        slot: 10                  # Optional manual slot (0-53). Remove to auto-place.
+        page: 0                   # Optional manual page (0-based). Remove to auto-place.
+        items:
+          COW:
+            price: 200
+            # Optional custom lore (overrides locale):
+            # lore:
+            #   - "&7Price: &e{price} {currency}"
+            #   - "&bClick to buy"
+          CHICKEN:
+            price: 150
+          PIG:
+            price: 200
+          SHEEP:
+            price: 200
+          RABBIT:
+            price: 250
+      COMBAT:
+        title: "&7Combat Spawners"
+        icon-material: "IRON_SWORD"
+        slot: 12
+        page: 0
+        items:
+          ZOMBIE:
+            price: 350
+          SKELETON:
+            price: 350
+          SPIDER:
+            price: 400
+          CREEPER:
+            price: 1500
+      NETHER:
+        title: "&7Nether Spawners"
+        icon-material: "NETHERRACK"
+        slot: 14
+        page: 0
+        items:
+          BLAZE:
+            price: 3000
+          MAGMA_CUBE:
+            price: 2200
+          WITHER_SKELETON:
+            price: 5000
+          GHAST:
+            price: 6000
+      RARE:
+        title: "&7Rare Spawners"
+        icon-material: "AMETHYST_CLUSTER"
+        slot: 16
+        page: 0
+        items:
+          ENDERMAN:
+            price: 5500
+          WITCH:
+            price: 4500
+          IRON_GOLEM:
+            price: 8000
+
+# -----------------------------------------------------
+# MOB HEADS: <site: https://minecraft-heads.com/custom-heads/head/ - VALUE FOR DEVELOPER>
+#
+# Example:
+# ALLAY: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUwMjk0YTE3NDczMTBmMTA0MTI0YzYzNzNjYzYzOWI3MTJiYWE1N2I3ZDkyNjI5N2I2NDUxODhiN2JiOWFiOSJ9fX0=
+# -----------------------------------------------------

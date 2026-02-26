@@ -1,0 +1,9 @@
+packages:
+  - "api"
+  - "web"
+
+catalog:
+  typescript: "^5"
+  tsx: "^4"
+
+injectWorkspacePackages: true
