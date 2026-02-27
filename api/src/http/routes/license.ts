@@ -3,7 +3,7 @@ import { MongoServerError } from "mongodb";
 import { z } from "zod";
 
 import { db } from "../../database/client.js";
-import { generate as generateLicense, view as viewLicense } from "../plugins/atos.js";
+import { generate as generateLicense, view as viewLicense } from "../plugins/code.js";
 
 type LicenseTier = "default";
 type LicenseValue = {
@@ -30,6 +30,7 @@ const licenseOwnerIndexReady = giftsCollection.createIndex(
   { type: 1, "value.ownerId": 1 },
   {
     unique: true,
+    name: "pluginsx_license_owner_unique_idx",
     partialFilterExpression: {
       type: "pluginsx_license",
       "value.ownerId": { $exists: true },
