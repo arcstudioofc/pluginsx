@@ -26,16 +26,20 @@ admin:
     give-success: "{prefix} &aYou received a &e{type} &aspawner at level &e{level}&a."
     mobs:
       title: "&8Admin Spawners &7(Mobs {page}/{pages})"
+      header: "&6Select spawner type"
       item-name: "&e{type}"
-      item-lore: "&7Click to choose a level"
+      item-lore: "&7Choose a type to open its levels\\n&bClick to continue"
+      empty: "&cNo mobs available to display"
     levels:
-      title: "&8Levels: &e{type}"
+      title: "&8Levels: &e{type} &7({page}/{pages})"
+      header: "&6Levels for &e{type}"
       item-name: "&6Level {level}"
-      item-lore: "&7Click to receive this spawner"
+      item-lore: "&7Receive a spawner at this level\\n&bClick to claim"
+      empty: "&cNo levels available for this type"
     nav:
       prev: "&ePrevious page"
       next: "&eNext page"
-      back: "&cBack to mobs"
+      back: "&eBack to mobs"
       page: "&7Page &e{page}&7/&e{pages}"
 
 # License
@@ -170,6 +174,16 @@ menu:
     status-active: "&aActive"
     status-inactive: "&cInactive (No players)"
     footer: "&8(Updating in real time)"
+  stack-details:
+    title: "&8Stack Details: &e{type} &7({page}/{pages})"
+    item-name: "&eSpawner #{index} &7of &f{total}"
+    item-lore: "&7Type: &f{type}\\n&7Level: &e{level}\\n&7Unit: &e{index}&7/&e{total}\\n&7Spawn per cycle: &e{spawn_count}\\n&7Max nearby entities: &e{max_nearby}\\n&7Current delay: &e{delay} ticks\\n&7Interval: &e{min}s - {max}s\\n&7Status: {status}"
+    empty: "&cNo stacked spawners to display"
+    nav:
+      prev: "&ePrevious page"
+      next: "&eNext page"
+      back: "&eBack to summary"
+      page: "&7Page &e{page}&7/&e{pages}"
   owner-item:
     name: "&f{player}"
     lore: "&7This spawner was placed by."

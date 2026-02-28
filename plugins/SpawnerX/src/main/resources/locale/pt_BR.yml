@@ -26,16 +26,20 @@ admin:
     give-success: "{prefix} &aVocê recebeu um spawner de &e{type} &ano nível &e{level}&a."
     mobs:
       title: "&8Admin Spawners &7(Mobs {page}/{pages})"
+      header: "&6Selecionar tipo de spawner"
       item-name: "&e{type}"
-      item-lore: "&7Clique para escolher o nível"
+      item-lore: "&7Escolha o tipo para abrir os níveis\\n&bClique para continuar"
+      empty: "&cNenhum mob disponível para exibir"
     levels:
-      title: "&8Níveis: &e{type}"
+      title: "&8Níveis: &e{type} &7({page}/{pages})"
+      header: "&6Níveis de &e{type}"
       item-name: "&6Nível {level}"
-      item-lore: "&7Clique para receber este spawner"
+      item-lore: "&7Receba um spawner nesse nível\\n&bClique para coletar"
+      empty: "&cNenhum nível disponível para este tipo"
     nav:
       prev: "&ePágina anterior"
       next: "&ePróxima página"
-      back: "&cVoltar para mobs"
+      back: "&eVoltar para mobs"
       page: "&7Página &e{page}&7/&e{pages}"
 
 # Licença
@@ -170,6 +174,16 @@ menu:
     status-active: "&aAtivo"
     status-inactive: "&cInativo (Sem players)"
     footer: "&8(Atualizando em tempo real)"
+  stack-details:
+    title: "&8Detalhes do Stack: &e{type} &7({page}/{pages})"
+    item-name: "&eSpawner #{index} &7de &f{total}"
+    item-lore: "&7Tipo: &f{type}\\n&7Nível: &e{level}\\n&7Unidade: &e{index}&7/&e{total}\\n&7Spawn por ciclo: &e{spawn_count}\\n&7Máx. entidades próximas: &e{max_nearby}\\n&7Delay atual: &e{delay} ticks\\n&7Intervalo: &e{min}s - {max}s\\n&7Status: {status}"
+    empty: "&cNenhum spawner no stack para exibir"
+    nav:
+      prev: "&ePágina anterior"
+      next: "&ePróxima página"
+      back: "&eVoltar ao resumo"
+      page: "&7Página &e{page}&7/&e{pages}"
   owner-item:
     name: "&f{player}"
     lore: "&7Este spawner foi colocado por."

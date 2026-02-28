@@ -96,6 +96,25 @@ spawner:
     - "&7Raridade: {rarity_color}{rarity}"
     - "&7Quantidade: &e{stack_size}"
 
+  # Buff base configurável para spawners padrão (nível 0)
+  # Níveis de upgrade são aplicados por cima desses valores.
+  # Esses números viram a "base canônica" de cálculo do SpawnerX.
+  #
+  # Resumo rápido de impacto:
+  # - stack maior => escala linear em spawn-count e max-nearby-entities
+  # - nível maior => bônus adicional por cima dessa base
+  #
+  # Dica de balanceamento:
+  # - Se quer mais mobs por ciclo: aumente spawn-count
+  # - Se quer menos bloqueio por lotação: aumente max-nearby-entities
+  # - Se quer ciclos mais rápidos: reduza min/max-spawn-delay
+  # - Sempre mantenha min-spawn-delay <= max-spawn-delay
+  base-stats:
+    spawn-count: 6 # Quantos mobs o spawner tenta gerar por ciclo (base do nível 0).
+    max-nearby-entities: 12 # Limite de mobs da mesma categoria próximos antes de bloquear novo spawn.
+    min-spawn-delay: 140 # Menor tempo (em ticks) entre tentativas de spawn. 20 ticks = 1 segundo.
+    max-spawn-delay: 500 # Maior tempo (em ticks) entre tentativas. Deve ser >= min-spawn-delay.
+
   upgrade:
     active: true # Ativa ou desativa completamente o sistema de upgrades
 
@@ -122,15 +141,15 @@ spawner:
     boost-type: HYBRID
 
     levels:
-      COPPER:
+      COAL:
         level: 1
-        boost: 0.5
+        boost: 1
         cost:
-          material: COPPER_BLOCK
+          material: COAL_BLOCK
           amount: 8
         display:
-          name-suffix: "&e&l ✦"
-          lore-line: "&7Nível: &eCobre &7| &aBônus: &f+50%"
+          name-suffix: "&8&l ✦"
+          lore-line: "&7Nível: &8Carvão"
 
       IRON:
         level: 2
@@ -140,50 +159,61 @@ spawner:
           amount: 8
         display:
           name-suffix: "&f&l ✦"
-          lore-line: "&7Nível: &fFerro &7| &aBônus: &f+150%"
+          lore-line: "&7Nível: &fCarvão"
 
       GOLD:
         level: 3
-        boost: 2.0
+        boost: 3.0
         max-stack-size: 64
         cost:
           material: GOLD_BLOCK
           amount: 8
         display:
           name-suffix: "&6&l ✦"
-          lore-line: "&7Nível: &6Ouro &7| &aBônus: &f+200%"
+          lore-line: "&7Nível: &6Ouro"
 
       DIAMOND:
         level: 4
-        boost: 3.0
+        boost: 6.0
         cost:
           material: DIAMOND_BLOCK
           amount: 6
         display:
           name-suffix: "&b&l ✦"
-          lore-line: "&7Nível: &bDiamante &7| &aBônus: &f+300%"
+          lore-line: "&7Nível: &bDiamante"
 
-      EMERALD:
-        level: 5
-        boost: 6.0
-        max-stack-size: 64
-        cost:
-          material: EMERALD_BLOCK
-          amount: 6
-        display:
-          name-suffix: "&a&l ✦"
-          lore-line: "&7Nível: &aEsmeralda &7| &aBônus: &f+300%"
+      # EMERALD:
+      #   level: 5
+      #   boost: 12.0
+      #   max-stack-size: 64
+      #   cost:
+      #     material: EMERALD_BLOCK
+      #     amount: 6
+      #   display:
+      #     name-suffix: "&a&l ✦"
+      #     lore-line: "&7Nível: &aEsmeralda"
 
       NETHERITE:
-        level: 6
-        boost: 8.0
+        level: 5
+        boost: 16.0
         max-stack-size: 32
         cost:
           material: NETHERITE_BLOCK
           amount: 4
         display:
           name-suffix: "&5&l ✦"
-          lore-line: "&7Nível: &5Netherita &7| &aBônus: &f+400%"
+          lore-line: "&7Nível: &5Netherita"
+
+      ULTIMATE:
+        level: 6
+        boost: 32.0
+        # max-stack-size: 32
+        cost:
+          material: NETHER_STAR
+          amount: 6
+        display:
+          name-suffix: "&d&l ✦"
+          lore-line: "&7Nível: &dUltimate"
 
     # Define o nível máximo permitido globalmente.
     # Mesmo que existam níveis acima configurados,
@@ -250,5 +280,7 @@ mob-rarities:
 
   ZOMBIE_VILLAGER: legendary
   IRON_GOLEM: legendary
+
+  VILLAGER: secret
 
   DEFAULT: common

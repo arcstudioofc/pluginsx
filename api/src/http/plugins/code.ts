@@ -1,4 +1,3 @@
-// import { randomBytes } from "node:crypto";
 import { Code, generateCodeBody } from "@yeytaken/code";
 import { mongodbAdapter } from "@yeytaken/code/adapters/mongodb";
 
@@ -11,8 +10,6 @@ export type LicenseView = {
   type?: string;
   value?: unknown;
 };
-
-// const createCodeId = () => randomBytes(12).toString("hex");
 
 const license = Code({
   database: mongodbAdapter(db, { client }),

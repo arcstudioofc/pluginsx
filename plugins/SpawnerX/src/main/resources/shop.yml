@@ -54,9 +54,9 @@ spawner:
       auto-cleanup-minutes: 5     # Cleanup task period
       menu-slot: 40               # Slot of the public sales button in categories view
     navigation:
-      prev-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM0ZjliZTNjYmVlYmQ3ZDJlYWY4YWRhYWY2Mzg3YmIyNmJkYmQ3MWFkNTI4NGJjZDFhNTYxMjVlN2MwMjIwNCJ9fX0=" # Left arrow head (base64)
+      prev-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ3NmU4ZTk5YzNkZGFhYTdlMDRmNzNhMjM3NjM0OTBkNjllZWVmMmU4NWEyZGVkMzU4OWNmODMzYmRmYzE4NyJ9fX0=" # Left arrow head (base64) eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM0ZjliZTNjYmVlYmQ3ZDJlYWY4YWRhYWY2Mzg3YmIyNmJkYmQ3MWFkNTI4NGJjZDFhNTYxMjVlN2MwMjIwNCJ9fX0=
       next-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2UyMDIzY2QxNWNjZGUzNjEwMzg1ZDQzM2Y0ZTdmMTZhMzU2NzcxZDhmNDIwYTk4NmI5N2I3MTIxZDFlMWFlMyJ9fX0=" # Right arrow head (base64)
-      back-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ3NmU4ZTk5YzNkZGFhYTdlMDRmNzNhMjM3NjM0OTBkNjllZWVmMmU4NWEyZGVkMzU4OWNmODMzYmRmYzE4NyJ9fX0=" # Back arrow head (base64)
+      back-head: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmM0ZjliZTNjYmVlYmQ3ZDJlYWY4YWRhYWY2Mzg3YmIyNmJkYmQ3MWFkNTI4NGJjZDFhNTYxMjVlN2MwMjIwNCJ9fX0=" # Back arrow head (base64) eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTQ3NmU4ZTk5YzNkZGFhYTdlMDRmNzNhMjM3NjM0OTBkNjllZWVmMmU4NWEyZGVkMzU4OWNmODMzYmRmYzE4NyJ9fX0=
       title-item: "COMPASS" # Item used in the top bar title slot
       filler-primary: "LIGHT_GRAY_STAINED_GLASS_PANE"
       filler-secondary: "WHITE_STAINED_GLASS_PANE"

@@ -1,6 +1,7 @@
 package com.spawnerx.managers;
 
 import com.spawnerx.SpawnerX;
+import com.spawnerx.utils.SkullUtils;
 import com.spawnerx.utils.SpawnerUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Gerencia o menu admin para entrega de spawners.
@@ -26,16 +28,17 @@ import java.util.List;
 public class AdminSpawnerMenuManager {
 
     private static final int MENU_SIZE = 54;
-    private static final int LEVEL_MENU_SIZE = 27;
     private static final int[] CONTENT_SLOTS = {
         10, 11, 12, 13, 14, 15, 16,
         19, 20, 21, 22, 23, 24, 25,
         28, 29, 30, 31, 32, 33, 34
     };
     private static final int SLOT_PREV = 45;
+    private static final int SLOT_BACK = 48;
     private static final int SLOT_PAGE = 49;
     private static final int SLOT_NEXT = 53;
-    private static final int SLOT_BACK = 18;
+    private static final int SLOT_TITLE = 4;
+    private static final int SLOT_EMPTY = 22;
 
     private final SpawnerX plugin;
     private final NamespacedKey navKey;
@@ -101,13 +104,25 @@ public class AdminSpawnerMenuManager {
             return;
         }
 
-        openLevelMenu(player, entityType);
+        openLevelMenu(player, entityType, 0, holder.getPage());
     }
 
     private void handleLevelViewClick(Player player, AdminSpawnerMenuHolder holder,
                                       PersistentDataContainer container, String nav) {
         if ("back".equals(nav)) {
-            openMobMenu(player, 0);
+            openMobMenu(player, holder.getParentPage());
+            return;
+        }
+        if ("prev".equals(nav)) {
+            if (holder.getSelectedEntity() != null) {
+                openLevelMenu(player, holder.getSelectedEntity(), holder.getPage() - 1, holder.getParentPage());
+            }
+            return;
+        }
+        if ("next".equals(nav)) {
+            if (holder.getSelectedEntity() != null) {
+                openLevelMenu(player, holder.getSelectedEntity(), holder.getPage() + 1, holder.getParentPage());
+            }
             return;
         }
 
@@ -125,7 +140,7 @@ public class AdminSpawnerMenuManager {
         }
 
         if (holder.getSelectedEntity() != null && holder.getSelectedEntity() != entityType) {
-            openLevelMenu(player, holder.getSelectedEntity());
+            openLevelMenu(player, holder.getSelectedEntity(), holder.getPage(), holder.getParentPage());
             return;
         }
 
@@ -142,12 +157,14 @@ public class AdminSpawnerMenuManager {
             "pages", String.valueOf(totalPages));
 
         Inventory inventory = Bukkit.createInventory(
-            new AdminSpawnerMenuHolder(AdminSpawnerMenuHolder.View.MOBS, currentPage, null),
+            new AdminSpawnerMenuHolder(AdminSpawnerMenuHolder.View.MOBS, currentPage, null, currentPage),
             MENU_SIZE,
             LegacyComponentSerializer.legacyAmpersand().deserialize(title)
         );
 
-        fillBackground(inventory, MENU_SIZE);
+        fillBackground(inventory);
+        placeTitleBar(inventory, plugin.getLocaleManager().getMessage("admin.menu.mobs.header"));
+        placeNavigation(inventory, currentPage, totalPages, false);
 
         int start = currentPage * CONTENT_SLOTS.length;
         int end = Math.min(start + CONTENT_SLOTS.length, mobs.size());
@@ -159,46 +176,52 @@ public class AdminSpawnerMenuManager {
             contentIndex++;
         }
 
-        if (currentPage > 0) {
-            inventory.setItem(SLOT_PREV, createNavItem("prev", Material.ARROW,
-                plugin.getLocaleManager().getMessage("admin.menu.nav.prev")));
+        if (start >= end) {
+            inventory.setItem(SLOT_EMPTY, createInfoItem(Material.BARRIER,
+                plugin.getLocaleManager().getMessage("admin.menu.mobs.empty")));
         }
-        if (currentPage < totalPages - 1) {
-            inventory.setItem(SLOT_NEXT, createNavItem("next", Material.ARROW,
-                plugin.getLocaleManager().getMessage("admin.menu.nav.next")));
-        }
-
-        inventory.setItem(SLOT_PAGE, createInfoItem(Material.PAPER,
-            plugin.getLocaleManager().getMessage("admin.menu.nav.page",
-                "page", String.valueOf(currentPage + 1),
-                "pages", String.valueOf(totalPages))));
 
         player.openInventory(inventory);
     }
 
     private void openLevelMenu(Player player, EntityType entityType) {
+        openLevelMenu(player, entityType, 0, 0);
+    }
+
+    private void openLevelMenu(Player player, EntityType entityType, int page, int parentPage) {
         List<Integer> levels = getAvailableLevels();
+        int totalPages = Math.max(1, (int) Math.ceil((double) levels.size() / CONTENT_SLOTS.length));
+        int currentPage = clampPage(page, totalPages);
         String entityName = SpawnerUtils.getEntityDisplayName(entityType);
 
-        String title = plugin.getLocaleManager().getMessage("admin.menu.levels.title", "type", entityName);
+        String title = plugin.getLocaleManager().getMessage("admin.menu.levels.title",
+            "type", entityName,
+            "page", String.valueOf(currentPage + 1),
+            "pages", String.valueOf(totalPages));
         Inventory inventory = Bukkit.createInventory(
-            new AdminSpawnerMenuHolder(AdminSpawnerMenuHolder.View.LEVELS, 0, entityType),
-            LEVEL_MENU_SIZE,
+            new AdminSpawnerMenuHolder(AdminSpawnerMenuHolder.View.LEVELS, currentPage, entityType, parentPage),
+            MENU_SIZE,
             LegacyComponentSerializer.legacyAmpersand().deserialize(title)
         );
 
-        fillBackground(inventory, LEVEL_MENU_SIZE);
-        inventory.setItem(SLOT_BACK, createNavItem("back", Material.BARRIER,
-            plugin.getLocaleManager().getMessage("admin.menu.nav.back")));
+        fillBackground(inventory);
+        placeTitleBar(inventory, plugin.getLocaleManager().getMessage("admin.menu.levels.header",
+            "type", entityName));
+        placeNavigation(inventory, currentPage, totalPages, true);
 
-        int[] levelSlots = {10, 11, 12, 13, 14, 15, 16};
-        int index = 0;
-        for (int level : levels) {
-            if (index >= levelSlots.length) {
-                break;
-            }
-            inventory.setItem(levelSlots[index], createLevelItem(entityType, level));
-            index++;
+        int start = currentPage * CONTENT_SLOTS.length;
+        int end = Math.min(start + CONTENT_SLOTS.length, levels.size());
+        int contentIndex = 0;
+
+        for (int i = start; i < end; i++) {
+            int level = levels.get(i);
+            inventory.setItem(CONTENT_SLOTS[contentIndex], createLevelItem(entityType, level));
+            contentIndex++;
+        }
+
+        if (start >= end) {
+            inventory.setItem(SLOT_EMPTY, createInfoItem(Material.BARRIER,
+                plugin.getLocaleManager().getMessage("admin.menu.levels.empty")));
         }
 
         player.openInventory(inventory);
@@ -217,9 +240,7 @@ public class AdminSpawnerMenuManager {
             "type", entityName
         )));
 
-        List<Component> lore = new ArrayList<>();
-        lore.add(deserializeNoItalic(plugin.getLocaleManager().getMessage("admin.menu.mobs.item-lore")));
-        meta.lore(lore);
+        meta.lore(createLore(plugin.getLocaleManager().getMessage("admin.menu.mobs.item-lore")));
 
         meta.getPersistentDataContainer().set(entityKey, PersistentDataType.STRING, entityType.name());
         item.setItemMeta(meta);
@@ -238,9 +259,7 @@ public class AdminSpawnerMenuManager {
             "level", String.valueOf(level)
         )));
 
-        List<Component> lore = new ArrayList<>();
-        lore.add(deserializeNoItalic(plugin.getLocaleManager().getMessage("admin.menu.levels.item-lore")));
-        meta.lore(lore);
+        meta.lore(createLore(plugin.getLocaleManager().getMessage("admin.menu.levels.item-lore")));
 
         PersistentDataContainer container = meta.getPersistentDataContainer();
         container.set(entityKey, PersistentDataType.STRING, entityType.name());
@@ -249,8 +268,28 @@ public class AdminSpawnerMenuManager {
         return item;
     }
 
-    private ItemStack createNavItem(String nav, Material material, String name) {
-        ItemStack item = new ItemStack(material);
+    private void placeNavigation(Inventory inventory, int page, int totalPages, boolean showBack) {
+        if (totalPages > 1 && page > 0) {
+            inventory.setItem(SLOT_PREV, createNavItem("prev", plugin.getConfigManager().getShopNavHead("prev-head"),
+                Material.ARROW, plugin.getLocaleManager().getMessage("admin.menu.nav.prev")));
+        }
+        if (totalPages > 1 && page < totalPages - 1) {
+            inventory.setItem(SLOT_NEXT, createNavItem("next", plugin.getConfigManager().getShopNavHead("next-head"),
+                Material.ARROW, plugin.getLocaleManager().getMessage("admin.menu.nav.next")));
+        }
+        if (showBack) {
+            inventory.setItem(SLOT_BACK, createNavItem("back", plugin.getConfigManager().getShopNavHead("back-head"),
+                Material.BARRIER, plugin.getLocaleManager().getMessage("admin.menu.nav.back")));
+        }
+
+        inventory.setItem(SLOT_PAGE, createInfoItem(Material.PAPER,
+            plugin.getLocaleManager().getMessage("admin.menu.nav.page",
+                "page", String.valueOf(page + 1),
+                "pages", String.valueOf(totalPages))));
+    }
+
+    private ItemStack createNavItem(String nav, String headBase64, Material fallbackMaterial, String name) {
+        ItemStack item = createHeadOrFallback(headBase64, fallbackMaterial);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(deserializeNoItalic(name));
@@ -270,16 +309,78 @@ public class AdminSpawnerMenuManager {
         return item;
     }
 
-    private void fillBackground(Inventory inventory, int size) {
-        ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+    private void placeTitleBar(Inventory inventory, String title) {
+        Material titleMaterial = parseMaterial(plugin.getConfigManager().getShopTitleItem(), Material.SPAWNER);
+        ItemStack item = new ItemStack(titleMaterial);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(deserializeNoItalic(title));
+            item.setItemMeta(meta);
+        }
+        inventory.setItem(SLOT_TITLE, item);
+    }
+
+    private ItemStack createHeadOrFallback(String headBase64, Material fallbackMaterial) {
+        if (headBase64 == null || headBase64.isBlank()) {
+            return new ItemStack(fallbackMaterial);
+        }
+
+        ItemStack head = SkullUtils.createSkull(headBase64);
+        if (head.getType() != Material.PLAYER_HEAD) {
+            return new ItemStack(fallbackMaterial);
+        }
+        return head;
+    }
+
+    private void fillBackground(Inventory inventory) {
+        Material primaryMat = parseMaterial(plugin.getConfigManager().getShopFillerPrimary(), Material.BLUE_STAINED_GLASS_PANE);
+        Material secondaryMat = parseMaterial(plugin.getConfigManager().getShopFillerSecondary(), Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+        Material accentMat = parseMaterial(plugin.getConfigManager().getShopFillerAccent(), Material.SEA_LANTERN);
+
+        ItemStack primary = createFiller(primaryMat);
+        ItemStack secondary = createFiller(secondaryMat);
+        ItemStack accent = createFiller(accentMat);
+
+        int size = inventory.getSize();
+        for (int slot = 0; slot < size; slot++) {
+            int row = slot / 9;
+            int col = slot % 9;
+
+            boolean outer = row == 0 || row == 5 || col == 0 || col == 8;
+            boolean corner = (row == 0 || row == 5) && (col == 0 || col == 8);
+            boolean edgeAccent = (col == 0 || col == 8) && (row == 2 || row == 3);
+            boolean inner = row == 1 || row == 4;
+
+            if (corner || edgeAccent) {
+                inventory.setItem(slot, accent);
+            } else if (outer) {
+                inventory.setItem(slot, primary);
+            } else if (inner) {
+                inventory.setItem(slot, secondary);
+            } else {
+                inventory.setItem(slot, secondary);
+            }
+        }
+    }
+
+    private ItemStack createFiller(Material material) {
+        ItemStack filler = new ItemStack(material);
         ItemMeta meta = filler.getItemMeta();
         if (meta != null) {
             meta.displayName(Component.text(" "));
             filler.setItemMeta(meta);
         }
+        return filler;
+    }
 
-        for (int i = 0; i < size; i++) {
-            inventory.setItem(i, filler);
+    private Material parseMaterial(String name, Material fallback) {
+        if (name == null || name.isBlank()) {
+            return fallback;
+        }
+        try {
+            return Material.valueOf(name.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return fallback;
         }
     }
 
@@ -305,6 +406,9 @@ public class AdminSpawnerMenuManager {
     }
 
     private int clampPage(int page, int totalPages) {
+        if (totalPages <= 0) {
+            return 0;
+        }
         if (page < 0) {
             return 0;
         }
@@ -324,6 +428,25 @@ public class AdminSpawnerMenuManager {
             "type", SpawnerUtils.getEntityDisplayName(entityType),
             "level", String.valueOf(Math.max(0, level))
         ));
+    }
+
+    private List<Component> createLore(String raw) {
+        List<Component> lore = new ArrayList<>();
+        for (String line : splitRawLines(raw)) {
+            lore.add(deserializeNoItalic(line));
+        }
+        return lore;
+    }
+
+    private List<String> splitRawLines(String raw) {
+        List<String> lines = new ArrayList<>();
+        if (raw == null || raw.isBlank()) {
+            return lines;
+        }
+        for (String line : raw.split("\\\\n")) {
+            lines.add(line);
+        }
+        return lines;
     }
 
     private Component deserializeNoItalic(String text) {

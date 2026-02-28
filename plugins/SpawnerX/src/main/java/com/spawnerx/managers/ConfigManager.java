@@ -478,6 +478,36 @@ public class ConfigManager {
         return config.getInt("spawner.distance-active", 64);
     }
 
+    /**
+     * Valor base de spawn-count para spawners nível 0.
+     */
+    public int getSpawnerBaseSpawnCount() {
+        return Math.max(1, config.getInt("spawner.base-stats.spawn-count", 6));
+    }
+
+    /**
+     * Valor base de max-nearby-entities para spawners nível 0.
+     */
+    public int getSpawnerBaseMaxNearbyEntities() {
+        return Math.max(1, config.getInt("spawner.base-stats.max-nearby-entities", 12));
+    }
+
+    /**
+     * Delay mínimo base de spawn para spawners nível 0.
+     */
+    public int getSpawnerBaseMinSpawnDelay() {
+        return Math.max(1, config.getInt("spawner.base-stats.min-spawn-delay", 140));
+    }
+
+    /**
+     * Delay máximo base de spawn para spawners nível 0.
+     */
+    public int getSpawnerBaseMaxSpawnDelay() {
+        int minDelay = getSpawnerBaseMinSpawnDelay();
+        int configured = config.getInt("spawner.base-stats.max-spawn-delay", 500);
+        return Math.max(minDelay, configured);
+    }
+
     public boolean isUpgradeActive() {
         return upgradeActive && !upgradeLevels.isEmpty();
     }

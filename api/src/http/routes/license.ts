@@ -15,7 +15,7 @@ type LicenseView = {
   type?: string;
   value?: unknown;
 };
-type GiftDoc = {
+type LicenseDoc = {
   id: string;
   type?: string;
   value?: unknown;
@@ -25,8 +25,8 @@ const DEFAULT_OWNER_ID = "default";
 const DEFAULT_TIER: LicenseTier = "default";
 const DEFAULT_CODE_PREFIX = "pluginsx_";
 
-const giftsCollection = db.collection<GiftDoc>("gifts");
-const licenseOwnerIndexReady = giftsCollection.createIndex(
+const licenseCollection = db.collection<LicenseDoc>("license");
+const licenseOwnerIndexReady = licenseCollection.createIndex(
   { type: 1, "value.ownerId": 1 },
   {
     unique: true,
@@ -71,7 +71,7 @@ const isDuplicateKeyError = (error: unknown): boolean => {
 };
 
 const findDefaultLicenseGift = async () =>
-  giftsCollection.findOne({
+  licenseCollection.findOne({
     type: "pluginsx_license",
     "value.ownerId": DEFAULT_OWNER_ID,
   });
@@ -82,7 +82,7 @@ const syncGiftDefaultTier = async (
 ) => {
   if (currentTier === DEFAULT_TIER) return;
 
-  await giftsCollection.updateOne(
+  await licenseCollection.updateOne(
     { id: giftId, type: "pluginsx_license" },
     {
       $set: {
@@ -101,7 +101,7 @@ const mapLicenseResponse = (code: string, view: LicenseView) => ({
 
 const regenerateDefaultLicense = async (previousCode?: string) => {
   if (previousCode) {
-    await giftsCollection.deleteOne({ id: previousCode, type: "pluginsx_license" });
+    await licenseCollection.deleteOne({ id: previousCode, type: "pluginsx_license" });
   }
 
   try {

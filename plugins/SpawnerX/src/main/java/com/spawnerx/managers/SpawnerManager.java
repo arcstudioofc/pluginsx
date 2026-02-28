@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
  */
 public class SpawnerManager {
 
+    private static final int FALLBACK_BASE_DELAY = 20;
+
     private final SpawnerX plugin;
     private final NamespacedKey entityKey;
     private final NamespacedKey ownerKey;
@@ -134,8 +136,16 @@ public class SpawnerManager {
      * Aplica os atributos de spawn combinando stack + upgrade.
      */
     public void applySpawnerStats(CreatureSpawner spawner, int stackSize, int level) {
+        applySpawnerStatsInternal(spawner, stackSize, level, true);
+    }
+
+    /**
+     * Aplica os atributos de spawn combinando stack + upgrade.
+     * Quando applyCurrentDelay=false, mantém o delay atual do ciclo sem reset.
+     */
+    private boolean applySpawnerStatsInternal(CreatureSpawner spawner, int stackSize, int level, boolean applyCurrentDelay) {
         if (spawner == null) {
-            return;
+            return false;
         }
 
         PersistentDataContainer container = spawner.getPersistentDataContainer();
@@ -143,11 +153,85 @@ public class SpawnerManager {
         int safeLevel = Math.max(0, level);
         container.set(levelKey, PersistentDataType.INTEGER, safeLevel);
 
-        int baseSpawn = getOrStoreBase(container, baseSpawnCountKey, spawner.getSpawnCount());
-        int baseMaxNearby = getOrStoreBase(container, baseMaxNearbyKey, spawner.getMaxNearbyEntities());
-        int baseDelay = getOrStoreBase(container, baseDelayKey, spawner.getDelay());
-        int baseMinDelay = getOrStoreBase(container, baseMinDelayKey, spawner.getMinSpawnDelay());
-        int baseMaxDelay = getOrStoreBase(container, baseMaxDelayKey, spawner.getMaxSpawnDelay());
+        boolean metadataChanged = false;
+        int defaultBaseSpawn = plugin.getConfigManager().getSpawnerBaseSpawnCount();
+        int defaultBaseMaxNearby = plugin.getConfigManager().getSpawnerBaseMaxNearbyEntities();
+        int defaultBaseMinDelay = plugin.getConfigManager().getSpawnerBaseMinSpawnDelay();
+        int defaultBaseMaxDelay = plugin.getConfigManager().getSpawnerBaseMaxSpawnDelay();
+
+        int baseSpawn;
+        if (!container.has(baseSpawnCountKey, PersistentDataType.INTEGER)) {
+            baseSpawn = defaultBaseSpawn;
+            container.set(baseSpawnCountKey, PersistentDataType.INTEGER, baseSpawn);
+            metadataChanged = true;
+        } else {
+            baseSpawn = container.getOrDefault(baseSpawnCountKey, PersistentDataType.INTEGER, defaultBaseSpawn);
+            if (baseSpawn <= 0) {
+                baseSpawn = defaultBaseSpawn;
+                container.set(baseSpawnCountKey, PersistentDataType.INTEGER, baseSpawn);
+                metadataChanged = true;
+            }
+        }
+
+        int baseMaxNearby;
+        if (!container.has(baseMaxNearbyKey, PersistentDataType.INTEGER)) {
+            baseMaxNearby = defaultBaseMaxNearby;
+            container.set(baseMaxNearbyKey, PersistentDataType.INTEGER, baseMaxNearby);
+            metadataChanged = true;
+        } else {
+            baseMaxNearby = container.getOrDefault(baseMaxNearbyKey, PersistentDataType.INTEGER, defaultBaseMaxNearby);
+            if (baseMaxNearby <= 0) {
+                baseMaxNearby = defaultBaseMaxNearby;
+                container.set(baseMaxNearbyKey, PersistentDataType.INTEGER, baseMaxNearby);
+                metadataChanged = true;
+            }
+        }
+
+        int baseMinDelay;
+        if (!container.has(baseMinDelayKey, PersistentDataType.INTEGER)) {
+            baseMinDelay = defaultBaseMinDelay;
+            container.set(baseMinDelayKey, PersistentDataType.INTEGER, baseMinDelay);
+            metadataChanged = true;
+        } else {
+            baseMinDelay = container.getOrDefault(baseMinDelayKey, PersistentDataType.INTEGER, defaultBaseMinDelay);
+            if (baseMinDelay <= 0) {
+                baseMinDelay = defaultBaseMinDelay;
+                container.set(baseMinDelayKey, PersistentDataType.INTEGER, baseMinDelay);
+                metadataChanged = true;
+            }
+        }
+
+        int baseMaxDelay;
+        if (!container.has(baseMaxDelayKey, PersistentDataType.INTEGER)) {
+            baseMaxDelay = Math.max(baseMinDelay, defaultBaseMaxDelay);
+            container.set(baseMaxDelayKey, PersistentDataType.INTEGER, baseMaxDelay);
+            metadataChanged = true;
+        } else {
+            baseMaxDelay = container.getOrDefault(baseMaxDelayKey, PersistentDataType.INTEGER, defaultBaseMaxDelay);
+            if (baseMaxDelay < baseMinDelay) {
+                baseMaxDelay = Math.max(baseMinDelay, defaultBaseMaxDelay);
+                container.set(baseMaxDelayKey, PersistentDataType.INTEGER, baseMaxDelay);
+                metadataChanged = true;
+            }
+        }
+
+        int currentDelay = spawner.getDelay();
+        int defaultBaseDelay = currentDelay > 0
+            ? clamp(currentDelay, baseMinDelay, baseMaxDelay)
+            : Math.max(FALLBACK_BASE_DELAY, baseMinDelay);
+        int baseDelay;
+        if (!container.has(baseDelayKey, PersistentDataType.INTEGER)) {
+            baseDelay = defaultBaseDelay;
+            container.set(baseDelayKey, PersistentDataType.INTEGER, baseDelay);
+            metadataChanged = true;
+        } else {
+            baseDelay = container.getOrDefault(baseDelayKey, PersistentDataType.INTEGER, defaultBaseDelay);
+            if (baseDelay < baseMinDelay || baseDelay > baseMaxDelay) {
+                baseDelay = clamp(baseDelay, baseMinDelay, baseMaxDelay);
+                container.set(baseDelayKey, PersistentDataType.INTEGER, baseDelay);
+                metadataChanged = true;
+            }
+        }
 
         double spawnMultiplier = safeStack;
         double delayDivider = 1.0D;
@@ -175,9 +259,59 @@ public class SpawnerManager {
 
         spawner.setSpawnCount(newSpawn);
         spawner.setMaxNearbyEntities(newMaxNearby);
-        spawner.setDelay(newDelay);
         spawner.setMinSpawnDelay(newMinDelay);
         spawner.setMaxSpawnDelay(newMaxDelay);
+        if (applyCurrentDelay) {
+            spawner.setDelay(newDelay);
+        }
+        return metadataChanged;
+    }
+
+    /**
+     * Reconcília atributos de spawn para spawners legados/desalinhados.
+     * Retorna true quando algum valor foi alterado.
+     */
+    public boolean reconcileSpawnerStats(CreatureSpawner spawner) {
+        if (spawner == null) {
+            return false;
+        }
+
+        PersistentDataContainer container = spawner.getPersistentDataContainer();
+        boolean changed = false;
+
+        int stack = container.getOrDefault(stackKey, PersistentDataType.INTEGER, 1);
+        if (stack <= 0) {
+            stack = 1;
+        }
+        if (!container.has(stackKey, PersistentDataType.INTEGER) ||
+            container.getOrDefault(stackKey, PersistentDataType.INTEGER, 1) != stack) {
+            container.set(stackKey, PersistentDataType.INTEGER, stack);
+            changed = true;
+        }
+
+        int level = container.getOrDefault(levelKey, PersistentDataType.INTEGER, 0);
+        if (level < 0) {
+            level = 0;
+        }
+        if (!container.has(levelKey, PersistentDataType.INTEGER) ||
+            container.getOrDefault(levelKey, PersistentDataType.INTEGER, 0) != level) {
+            container.set(levelKey, PersistentDataType.INTEGER, level);
+            changed = true;
+        }
+
+        int beforeSpawn = spawner.getSpawnCount();
+        int beforeMaxNearby = spawner.getMaxNearbyEntities();
+        int beforeMinDelay = spawner.getMinSpawnDelay();
+        int beforeMaxDelay = spawner.getMaxSpawnDelay();
+
+        boolean metadataChanged = applySpawnerStatsInternal(spawner, stack, level, false);
+
+        return changed
+            || metadataChanged
+            || beforeSpawn != spawner.getSpawnCount()
+            || beforeMaxNearby != spawner.getMaxNearbyEntities()
+            || beforeMinDelay != spawner.getMinSpawnDelay()
+            || beforeMaxDelay != spawner.getMaxSpawnDelay();
     }
 
     /**
@@ -449,6 +583,16 @@ public class SpawnerManager {
             return current;
         }
         return container.getOrDefault(key, PersistentDataType.INTEGER, current);
+    }
+
+    private int clamp(int value, int min, int max) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
     }
 
     private TextDisplay getExistingHologram(World world, PersistentDataContainer container) {

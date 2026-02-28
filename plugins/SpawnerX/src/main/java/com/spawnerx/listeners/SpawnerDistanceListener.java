@@ -31,6 +31,11 @@ public class SpawnerDistanceListener implements Listener {
             return;
         }
 
+        boolean changed = plugin.getSpawnerManager().reconcileSpawnerStats(spawner);
+        if (changed) {
+            spawner.update();
+        }
+
         if (plugin.isLicenseLocked()) {
             event.setCancelled(true);
             return;

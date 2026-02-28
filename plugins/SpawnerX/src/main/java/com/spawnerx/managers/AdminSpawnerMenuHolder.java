@@ -17,11 +17,13 @@ public class AdminSpawnerMenuHolder implements InventoryHolder {
     private final View view;
     private final int page;
     private final EntityType selectedEntity;
+    private final int parentPage;
 
-    public AdminSpawnerMenuHolder(View view, int page, EntityType selectedEntity) {
+    public AdminSpawnerMenuHolder(View view, int page, EntityType selectedEntity, int parentPage) {
         this.view = view;
         this.page = page;
         this.selectedEntity = selectedEntity;
+        this.parentPage = parentPage;
     }
 
     public View getView() {
@@ -34,6 +36,10 @@ public class AdminSpawnerMenuHolder implements InventoryHolder {
 
     public EntityType getSelectedEntity() {
         return selectedEntity;
+    }
+
+    public int getParentPage() {
+        return parentPage;
     }
 
     @Override
