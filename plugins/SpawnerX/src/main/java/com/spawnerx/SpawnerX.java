@@ -9,7 +9,10 @@ import com.spawnerx.managers.AdminSpawnerMenuManager;
 import com.spawnerx.managers.PublicSalesManager;
 import com.spawnerx.managers.SpawnerManager;
 import com.spawnerx.managers.SpawnerShopManager;
+import com.spawnerx.managers.StackSpawnChainTracker;
 import com.spawnerx.managers.TradeManager;
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -27,6 +30,7 @@ public class SpawnerX extends JavaPlugin {
     private PublicSalesManager publicSalesManager;
     private TradeManager tradeManager;
     private LicenseManager licenseManager;
+    private StackSpawnChainTracker stackSpawnChainTracker;
     
     @Override
     public void onEnable() {
@@ -38,6 +42,7 @@ public class SpawnerX extends JavaPlugin {
         this.publicSalesManager = new PublicSalesManager(this);
         this.spawnerShopManager = new SpawnerShopManager(this);
         this.adminSpawnerMenuManager = new AdminSpawnerMenuManager(this);
+        this.stackSpawnChainTracker = new StackSpawnChainTracker();
 
         configManager.loadConfig();
         localeManager.loadLocale();
@@ -56,6 +61,8 @@ public class SpawnerX extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnerInteractListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnerStackListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnerDistanceListener(this), this);
+        getServer().getPluginManager().registerEvents(new SpawnerStackChainListener(this), this);
+        getServer().getPluginManager().registerEvents(new SpawnerChunkMigrationListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnerShopListener(this), this);
         getServer().getPluginManager().registerEvents(new AdminSpawnerMenuListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerPayoutListener(this), this);
@@ -76,6 +83,7 @@ public class SpawnerX extends JavaPlugin {
         getLogger().info(" SpawnerX v" + getDescription().getVersion());
 
         licenseManager.validateSavedLicense();
+        getServer().getScheduler().runTask(this, () -> reconcileLoadedSpawnerChunks(true));
     }
 
     
@@ -86,6 +94,9 @@ public class SpawnerX extends JavaPlugin {
         }
         if (tradeManager != null) {
             tradeManager.shutdown();
+        }
+        if (stackSpawnChainTracker != null) {
+            stackSpawnChainTracker.clearAll();
         }
         getLogger().info("SpawnerX desabilitado!");
     }
@@ -158,6 +169,13 @@ public class SpawnerX extends JavaPlugin {
     }
 
     /**
+     * Obtém o rastreador de cadeia de spawn por stack.
+     */
+    public StackSpawnChainTracker getStackSpawnChainTracker() {
+        return stackSpawnChainTracker;
+    }
+
+    /**
      * Verifica se a licença está validada.
      */
     public boolean isLicenseValid() {
@@ -197,11 +215,25 @@ public class SpawnerX extends JavaPlugin {
             if (tradeManager != null) {
                 tradeManager.reloadSettings();
             }
+            reconcileLoadedSpawnerChunks(true);
             return;
         }
         publicSalesManager.reloadSettings();
         if (tradeManager != null) {
             tradeManager.reloadSettings();
+        }
+        reconcileLoadedSpawnerChunks(true);
+    }
+
+    private void reconcileLoadedSpawnerChunks(boolean applyCurrentDelay) {
+        if (spawnerManager == null || getServer() == null) {
+            return;
+        }
+
+        for (World world : getServer().getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                spawnerManager.reconcileChunkSpawners(chunk, applyCurrentDelay);
+            }
         }
     }
 }

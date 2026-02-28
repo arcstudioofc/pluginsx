@@ -90,6 +90,10 @@ spawner:
   distance-active: 64 # Distância para ativar (padrão vanilla)
   stacking-enabled: true # Permitir empilhamento
   max-stack-size: 64 # Máximo por pilha
+  stack-spawn:
+    mode: CHAINED # CHAINED = cadeia por unidade, SIMULTANEOUS = burst por ciclo
+    order: RANDOM_CYCLE # SEQUENTIAL | RANDOM | RANDOM_CYCLE
+    chain-min-delay-ticks: 5 # Delay mínimo efetivo em modo CHAINED
   display-name: "&8[{rarity_color}&l{rarity}&8] &eSpawner de {type}"
   lore:
     - "&7Tipo: &f{type}"

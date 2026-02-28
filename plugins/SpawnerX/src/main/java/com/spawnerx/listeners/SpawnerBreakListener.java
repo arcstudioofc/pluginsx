@@ -76,6 +76,7 @@ public class SpawnerBreakListener implements Listener {
                 player.sendMessage(plugin.getLocaleManager().getMessage("break.success-no-req", "type", entityName));
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
                 plugin.getSpawnerManager().removeSpawnerHologram(block);
+                plugin.getStackSpawnChainTracker().clear(block.getLocation());
                 return; // Deixa o bloco ser quebrado normalmente pelo Minecraft (sem drop customizado)
             } else {
                 // Comportamento padrão: cancelar quebra
@@ -122,6 +123,7 @@ public class SpawnerBreakListener implements Listener {
         // Se estiver agachado, dropar 1 item com o stack inteiro
         if (dropStacked) {
             plugin.getSpawnerManager().removeSpawnerHologram(block);
+            plugin.getStackSpawnChainTracker().clear(block.getLocation());
             return;
         }
 
@@ -139,5 +141,6 @@ public class SpawnerBreakListener implements Listener {
         }
 
         plugin.getSpawnerManager().removeSpawnerHologram(block);
+        plugin.getStackSpawnChainTracker().clear(block.getLocation());
     }
 }

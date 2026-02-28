@@ -67,7 +67,13 @@ const isDuplicateKeyError = (error: unknown): boolean => {
   if (rawCode === 11000) return true;
 
   const rawMessage = (error as { message?: unknown }).message;
-  return typeof rawMessage === "string" && rawMessage.includes("E11000");
+  if (typeof rawMessage !== "string") return false;
+
+  return (
+    rawMessage.includes("E11000") ||
+    rawMessage.includes("Code collision detected for provided `codeOptions.body`") ||
+    rawMessage.includes("Code collision detected")
+  );
 };
 
 const findDefaultLicenseGift = async () =>
@@ -116,16 +122,26 @@ const regenerateDefaultLicense = async (previousCode?: string) => {
     if (!isDuplicateKeyError(error)) throw error;
 
     const duplicated = await findDefaultLicenseGift();
-    if (!duplicated?.id) throw error;
+    if (duplicated?.id) {
+      const duplicatedTier = resolveTierFromValue(duplicated.value);
+      await syncGiftDefaultTier(duplicated.id, duplicatedTier);
 
-    const duplicatedTier = resolveTierFromValue(duplicated.value);
-    await syncGiftDefaultTier(duplicated.id, duplicatedTier);
+      const view = await viewLicense(duplicated.id);
+      return {
+        code: duplicated.id,
+        view,
+        created: false,
+      };
+    }
 
-    const view = await viewLicense(duplicated.id);
+    // Quando a colisão não vier de owner duplicado (ex.: corrida em geração de código),
+    // tentamos gerar novamente uma única vez antes de falhar.
+    const retryCode = await generateLicense(DEFAULT_OWNER_ID, DEFAULT_TIER);
+    const retryView = await viewLicense(retryCode);
     return {
-      code: duplicated.id,
-      view,
-      created: false,
+      code: retryCode,
+      view: retryView,
+      created: true,
     };
   }
 };

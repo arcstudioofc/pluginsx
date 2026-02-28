@@ -30,6 +30,17 @@ public class ConfigManager {
         HYBRID
     }
 
+    public enum StackSpawnMode {
+        CHAINED,
+        SIMULTANEOUS
+    }
+
+    public enum StackSpawnOrder {
+        SEQUENTIAL,
+        RANDOM,
+        RANDOM_CYCLE
+    }
+
     public record UpgradeLevel(
         String id,
         int level,
@@ -56,6 +67,9 @@ public class ConfigManager {
     private String upgradePermissionNode = "spawnerx.spawner.upgrade";
     private BoostType upgradeBoostType = BoostType.HYBRID;
     private int upgradeMaxLevel;
+    private StackSpawnMode stackSpawnMode = StackSpawnMode.CHAINED;
+    private StackSpawnOrder stackSpawnOrder = StackSpawnOrder.RANDOM_CYCLE;
+    private int stackChainMinDelayTicks = 5;
 
     private final Map<String, RarityDefinition> rarityDefinitions = new HashMap<>();
     private final Map<String, String> mobRarityMap = new HashMap<>();
@@ -74,6 +88,7 @@ public class ConfigManager {
         loadShopConfig();
         migrateConfig();
         parseUpgradeConfig();
+        parseStackSpawnConfig();
         parseRarityConfig();
     }
 
@@ -279,6 +294,37 @@ public class ConfigManager {
         } catch (IllegalArgumentException ex) {
             plugin.getLogger().warning("boost-type inválido '" + raw + "'. Usando HYBRID.");
             return BoostType.HYBRID;
+        }
+    }
+
+    private void parseStackSpawnConfig() {
+        stackSpawnMode = parseStackSpawnMode(config.getString("spawner.stack-spawn.mode", StackSpawnMode.CHAINED.name()));
+        stackSpawnOrder = parseStackSpawnOrder(
+            config.getString("spawner.stack-spawn.order", StackSpawnOrder.RANDOM_CYCLE.name()));
+        stackChainMinDelayTicks = Math.max(1, config.getInt("spawner.stack-spawn.chain-min-delay-ticks", 5));
+    }
+
+    private StackSpawnMode parseStackSpawnMode(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return StackSpawnMode.CHAINED;
+        }
+        try {
+            return StackSpawnMode.valueOf(raw.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            plugin.getLogger().warning("stack-spawn.mode inválido '" + raw + "'. Usando CHAINED.");
+            return StackSpawnMode.CHAINED;
+        }
+    }
+
+    private StackSpawnOrder parseStackSpawnOrder(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return StackSpawnOrder.RANDOM_CYCLE;
+        }
+        try {
+            return StackSpawnOrder.valueOf(raw.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            plugin.getLogger().warning("stack-spawn.order inválido '" + raw + "'. Usando RANDOM_CYCLE.");
+            return StackSpawnOrder.RANDOM_CYCLE;
         }
     }
 
@@ -506,6 +552,22 @@ public class ConfigManager {
         int minDelay = getSpawnerBaseMinSpawnDelay();
         int configured = config.getInt("spawner.base-stats.max-spawn-delay", 500);
         return Math.max(minDelay, configured);
+    }
+
+    public StackSpawnMode getStackSpawnMode() {
+        return stackSpawnMode;
+    }
+
+    public StackSpawnOrder getStackSpawnOrder() {
+        return stackSpawnOrder;
+    }
+
+    public int getStackChainMinDelayTicks() {
+        return stackChainMinDelayTicks;
+    }
+
+    public boolean isStackSpawnChained() {
+        return stackSpawnMode == StackSpawnMode.CHAINED;
     }
 
     public boolean isUpgradeActive() {

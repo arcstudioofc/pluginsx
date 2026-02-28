@@ -1,6 +1,7 @@
 package com.spawnerx.listeners;
 
 import com.spawnerx.SpawnerX;
+import com.spawnerx.managers.ConfigManager;
 import com.spawnerx.managers.SpawnerInteractMenuHolder;
 import com.spawnerx.utils.SpawnerUtils;
 import net.kyori.adventure.text.Component;
@@ -324,6 +325,11 @@ public class SpawnerInteractListener implements Listener {
         int maxDelay = spawner.getMaxSpawnDelay();
         int spawnCount = spawner.getSpawnCount();
         int maxNearby = spawner.getMaxNearbyEntities();
+        ConfigManager.StackSpawnMode chainMode = plugin.getConfigManager().getStackSpawnMode();
+        ConfigManager.StackSpawnOrder chainOrder = plugin.getConfigManager().getStackSpawnOrder();
+        int nextIndex = plugin.getStackSpawnChainTracker().peekNextIndex(block.getLocation(), stackSize, chainOrder);
+        String chainModeLabel = getChainModeLabel(chainMode);
+        String chainOrderLabel = getChainOrderLabel(chainOrder);
 
         boolean active = hasNearbyPlayers(block);
         String activeStatus = plugin.getLocaleManager().getMessage(
@@ -363,7 +369,10 @@ public class SpawnerInteractListener implements Listener {
                 delay,
                 minDelay,
                 maxDelay,
-                activeStatus
+                activeStatus,
+                chainModeLabel,
+                chainOrderLabel,
+                nextIndex
             );
             gui.setItem(DETAILS_CONTENT_SLOTS[index], detailItem);
             index++;
@@ -449,7 +458,8 @@ public class SpawnerInteractListener implements Listener {
 
     private ItemStack createStackDetailItem(EntityType entityType, int level, int index, int total,
                                             int spawnCount, int maxNearby, int delay, int minDelay, int maxDelay,
-                                            String activeStatus) {
+                                            String activeStatus, String chainModeLabel, String chainOrderLabel,
+                                            int nextIndex) {
         ItemStack item = plugin.getSpawnerManager().createSpawner(entityType, 1, level);
         ItemMeta meta = item.getItemMeta();
         if (meta == null) {
@@ -462,6 +472,10 @@ public class SpawnerInteractListener implements Listener {
             "total", String.valueOf(total)
         )));
 
+        String nextMarker = index == nextIndex
+            ? plugin.getLocaleManager().getMessage("menu.stack-details.chain.next-marker")
+            : plugin.getLocaleManager().getMessage("menu.stack-details.chain.idle-marker");
+
         String loreRaw = plugin.getLocaleManager().getMessage(
             "menu.stack-details.item-lore",
             "type", SpawnerUtils.getEntityDisplayName(entityType),
@@ -473,7 +487,11 @@ public class SpawnerInteractListener implements Listener {
             "delay", String.valueOf(delay),
             "min", String.valueOf(minDelay / 20),
             "max", String.valueOf(maxDelay / 20),
-            "status", activeStatus
+            "status", activeStatus,
+            "chain_mode", chainModeLabel,
+            "chain_order", chainOrderLabel,
+            "next_index", String.valueOf(nextIndex),
+            "next_marker", nextMarker
         );
         meta.lore(createLore(loreRaw));
 
@@ -631,6 +649,25 @@ public class SpawnerInteractListener implements Listener {
             return rarity.substring(idx, idx + 2);
         }
         return "&f";
+    }
+
+    private String getChainModeLabel(ConfigManager.StackSpawnMode mode) {
+        if (mode == ConfigManager.StackSpawnMode.SIMULTANEOUS) {
+            return plugin.getLocaleManager().getMessage("menu.stack-details.chain.mode.simultaneous");
+        }
+        return plugin.getLocaleManager().getMessage("menu.stack-details.chain.mode.chained");
+    }
+
+    private String getChainOrderLabel(ConfigManager.StackSpawnOrder order) {
+        ConfigManager.StackSpawnOrder safeOrder = order == null
+            ? ConfigManager.StackSpawnOrder.RANDOM_CYCLE
+            : order;
+
+        return switch (safeOrder) {
+            case SEQUENTIAL -> plugin.getLocaleManager().getMessage("menu.stack-details.chain.order.sequential");
+            case RANDOM -> plugin.getLocaleManager().getMessage("menu.stack-details.chain.order.random");
+            case RANDOM_CYCLE -> plugin.getLocaleManager().getMessage("menu.stack-details.chain.order.random-cycle");
+        };
     }
 
     private Component deserializeNoItalic(String text) {

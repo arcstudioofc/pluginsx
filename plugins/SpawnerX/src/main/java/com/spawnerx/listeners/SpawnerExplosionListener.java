@@ -87,6 +87,7 @@ public class SpawnerExplosionListener implements Listener {
                 }
 
                 plugin.getSpawnerManager().removeSpawnerHologram(block);
+                plugin.getStackSpawnChainTracker().clear(block.getLocation());
                 spawnersToRemove.add(block);
             }
         }

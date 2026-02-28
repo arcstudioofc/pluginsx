@@ -9,7 +9,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.Chunk;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
@@ -233,8 +235,11 @@ public class SpawnerManager {
             }
         }
 
-        double spawnMultiplier = safeStack;
-        double delayDivider = 1.0D;
+        boolean chainedMode = plugin.getConfigManager().isStackSpawnChained();
+        int chainDelayFloor = chainedMode ? plugin.getConfigManager().getStackChainMinDelayTicks() : 1;
+        double spawnMultiplier = chainedMode ? 1.0D : safeStack;
+        double maxNearbyMultiplier = safeStack;
+        double delayDivider = chainedMode ? safeStack : 1.0D;
 
         ConfigManager.UpgradeLevel upgradeLevel = plugin.getConfigManager().getUpgradeLevel(safeLevel);
         if (upgradeLevel != null && safeLevel > 0) {
@@ -243,19 +248,23 @@ public class SpawnerManager {
 
             switch (boostType) {
                 case MULTIPLIER -> delayDivider *= bonusFactor;
-                case ADDITIVE -> spawnMultiplier *= bonusFactor;
+                case ADDITIVE -> {
+                    spawnMultiplier *= bonusFactor;
+                    maxNearbyMultiplier *= bonusFactor;
+                }
                 case HYBRID -> {
                     spawnMultiplier *= bonusFactor;
+                    maxNearbyMultiplier *= bonusFactor;
                     delayDivider *= bonusFactor;
                 }
             }
         }
 
         int newSpawn = Math.max(1, (int) Math.round(baseSpawn * spawnMultiplier));
-        int newMaxNearby = Math.max(1, (int) Math.round(baseMaxNearby * spawnMultiplier));
-        int newDelay = Math.max(1, (int) Math.round(baseDelay / delayDivider));
-        int newMinDelay = Math.max(1, (int) Math.round(baseMinDelay / delayDivider));
-        int newMaxDelay = Math.max(newMinDelay, (int) Math.round(baseMaxDelay / delayDivider));
+        int newMaxNearby = Math.max(1, (int) Math.round(baseMaxNearby * maxNearbyMultiplier));
+        int newDelay = Math.max(chainDelayFloor, (int) Math.round(baseDelay / delayDivider));
+        int newMinDelay = Math.max(chainDelayFloor, (int) Math.round(baseMinDelay / delayDivider));
+        int newMaxDelay = Math.max(newMinDelay, Math.max(chainDelayFloor, (int) Math.round(baseMaxDelay / delayDivider)));
 
         spawner.setSpawnCount(newSpawn);
         spawner.setMaxNearbyEntities(newMaxNearby);
@@ -272,6 +281,14 @@ public class SpawnerManager {
      * Retorna true quando algum valor foi alterado.
      */
     public boolean reconcileSpawnerStats(CreatureSpawner spawner) {
+        return reconcileSpawnerStats(spawner, false);
+    }
+
+    /**
+     * Reconcília atributos de spawn para spawners legados/desalinhados.
+     * Retorna true quando algum valor foi alterado.
+     */
+    public boolean reconcileSpawnerStats(CreatureSpawner spawner, boolean applyCurrentDelay) {
         if (spawner == null) {
             return false;
         }
@@ -304,7 +321,7 @@ public class SpawnerManager {
         int beforeMinDelay = spawner.getMinSpawnDelay();
         int beforeMaxDelay = spawner.getMaxSpawnDelay();
 
-        boolean metadataChanged = applySpawnerStatsInternal(spawner, stack, level, false);
+        boolean metadataChanged = applySpawnerStatsInternal(spawner, stack, level, applyCurrentDelay);
 
         return changed
             || metadataChanged
@@ -312,6 +329,36 @@ public class SpawnerManager {
             || beforeMaxNearby != spawner.getMaxNearbyEntities()
             || beforeMinDelay != spawner.getMinSpawnDelay()
             || beforeMaxDelay != spawner.getMaxSpawnDelay();
+    }
+
+    /**
+     * Reconcília todos os spawners gerenciados pelo SpawnerX em um chunk.
+     * Retorna a quantidade de spawners atualizados.
+     */
+    public int reconcileChunkSpawners(Chunk chunk, boolean applyCurrentDelay) {
+        if (chunk == null) {
+            return 0;
+        }
+
+        int updated = 0;
+        for (BlockState state : chunk.getTileEntities()) {
+            if (!(state instanceof CreatureSpawner spawner)) {
+                continue;
+            }
+
+            PersistentDataContainer container = spawner.getPersistentDataContainer();
+            if (!container.has(stackKey, PersistentDataType.INTEGER)) {
+                continue;
+            }
+
+            boolean changed = reconcileSpawnerStats(spawner, applyCurrentDelay);
+            if (changed) {
+                spawner.update();
+                updated++;
+            }
+        }
+
+        return updated;
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Code, generateCodeBody } from "@yeytaken/code";
+import { Code } from "@yeytaken/code";
 import { mongodbAdapter } from "@yeytaken/code/adapters/mongodb";
 
 import { client, db } from "../../database/client.js";
@@ -28,10 +28,6 @@ export async function generate(ownerId: string, tier: TierType) {
     },
     codeOptions: {
       prefix: `${codePrefix}`,
-      body: await generateCodeBody({
-        length: 20,
-        charset: "abcdefghijklmnopqrstuvwxyz123567890",
-      }),
     },
   });
 }

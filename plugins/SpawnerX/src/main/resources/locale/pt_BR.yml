@@ -177,8 +177,18 @@ menu:
   stack-details:
     title: "&8Detalhes do Stack: &e{type} &7({page}/{pages})"
     item-name: "&eSpawner #{index} &7de &f{total}"
-    item-lore: "&7Tipo: &f{type}\\n&7Nível: &e{level}\\n&7Unidade: &e{index}&7/&e{total}\\n&7Spawn por ciclo: &e{spawn_count}\\n&7Máx. entidades próximas: &e{max_nearby}\\n&7Delay atual: &e{delay} ticks\\n&7Intervalo: &e{min}s - {max}s\\n&7Status: {status}"
+    item-lore: "&7Tipo: &f{type}\\n&7Nível: &e{level}\\n&7Unidade: {next_marker}&e{index}&7/&e{total}\\n&7Próximo índice: &e{next_index}\\n&7Modo de spawn: &e{chain_mode}\\n&7Ordem da cadeia: &e{chain_order}\\n&7Spawn por ciclo: &e{spawn_count}\\n&7Máx. entidades próximas: &e{max_nearby}\\n&7Delay atual: &e{delay} ticks\\n&7Intervalo: &e{min}s - {max}s\\n&7Status: {status}"
     empty: "&cNenhum spawner no stack para exibir"
+    chain:
+      mode:
+        chained: "Cadeia"
+        simultaneous: "Simultâneo"
+      order:
+        sequential: "Sequencial"
+        random: "Aleatória"
+        random-cycle: "Aleatória por ciclo"
+      next-marker: "&a▶ "
+      idle-marker: ""
     nav:
       prev: "&ePágina anterior"
       next: "&ePróxima página"
