@@ -10,9 +10,13 @@ import { indexRoutes } from "./http/routes/index.js";
 import { licenseRoutes } from "./http/routes/license.js";
 import { aboutRoutes } from "./http/routes/about.js";
 import { Package } from "./config/package.js";
+import { connectDatabase } from "./database/connect.js";
+
+await connectDatabase();
 
 const app = new Elysia({
   name: "PluginsX, API.",
+  prefix: "/v2",
   adapter: node()
 })
   .use(
@@ -44,7 +48,7 @@ const app = new Elysia({
   .use(licenseRoutes)
   .use(aboutRoutes)
   .listen({ port: env.DEFAULT_PORT }, (info) => {
-    logger(`🔥 api is running at ${info.hostname}:${info.port}`);
+    logger(`🔥 api rodando em ${info.hostname}:${info.port}`);
   });
 
 export type App = typeof app;

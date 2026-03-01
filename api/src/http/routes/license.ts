@@ -1,42 +1,19 @@
 import { Elysia } from "elysia";
-import { MongoServerError } from "mongodb";
 import { z } from "zod";
 
-import { db } from "../../database/client.js";
-import { generate as generateLicense, view as viewLicense } from "../plugins/code.js";
+import { License } from "../../database/models/License.js";
+import {
+  generate as generateLicense,
+  isValid as isLicenseValid,
+  view as viewLicense,
+  type LicenseView,
+} from "../plugins/license.js";
 
 type LicenseTier = "default";
-type LicenseValue = {
-  ownerId: string;
-  tier: LicenseTier;
-};
-type LicenseView = {
-  valid: boolean;
-  type?: string;
-  value?: unknown;
-};
-type LicenseDoc = {
-  id: string;
-  type?: string;
-  value?: unknown;
-};
 
 const DEFAULT_OWNER_ID = "default";
 const DEFAULT_TIER: LicenseTier = "default";
 const DEFAULT_CODE_PREFIX = "pluginsx_";
-
-const licenseCollection = db.collection<LicenseDoc>("license");
-const licenseOwnerIndexReady = licenseCollection.createIndex(
-  { type: 1, "value.ownerId": 1 },
-  {
-    unique: true,
-    name: "pluginsx_license_owner_unique_idx",
-    partialFilterExpression: {
-      type: "pluginsx_license",
-      "value.ownerId": { $exists: true },
-    },
-  },
-);
 
 const defaultLicenseSchema = z.object({
   code: z.string(),
@@ -45,58 +22,29 @@ const defaultLicenseSchema = z.object({
 });
 
 const generatedDefaultLicenseSchema = defaultLicenseSchema.extend({
-  created: z.boolean(),
+  created: z.literal(true).optional(),
 });
 
 const hasExpectedCodePrefix = (code: string) =>
   code.startsWith(DEFAULT_CODE_PREFIX);
 
-const resolveTierFromValue = (value: unknown): LicenseTier | undefined => {
+const resolveTierFromValue = (value: LicenseView["value"]): LicenseTier | undefined => {
   if (!value || typeof value !== "object") return undefined;
 
-  const rawTier = (value as Partial<LicenseValue>).tier;
+  const rawTier = (value as { tier?: unknown }).tier;
   return rawTier === "default" ? rawTier : undefined;
 };
 
-const isDuplicateKeyError = (error: unknown): boolean => {
-  if (error instanceof MongoServerError) return error.code === 11000;
+const findDefaultLicenseId = async (): Promise<string | undefined> => {
+  const license = await License.findOne({
+    "value.tier": DEFAULT_TIER,
+    "value.valid": true,
+  })
+    .select({ _id: 1 })
+    .sort({ _id: 1 })
+    .lean();
 
-  if (!error || typeof error !== "object") return false;
-
-  const rawCode = (error as { code?: unknown }).code;
-  if (rawCode === 11000) return true;
-
-  const rawMessage = (error as { message?: unknown }).message;
-  if (typeof rawMessage !== "string") return false;
-
-  return (
-    rawMessage.includes("E11000") ||
-    rawMessage.includes("Code collision detected for provided `codeOptions.body`") ||
-    rawMessage.includes("Code collision detected")
-  );
-};
-
-const findDefaultLicenseGift = async () =>
-  licenseCollection.findOne({
-    type: "pluginsx_license",
-    "value.ownerId": DEFAULT_OWNER_ID,
-  });
-
-const syncGiftDefaultTier = async (
-  giftId: string,
-  currentTier: LicenseTier | undefined,
-) => {
-  if (currentTier === DEFAULT_TIER) return;
-
-  await licenseCollection.updateOne(
-    { id: giftId, type: "pluginsx_license" },
-    {
-      $set: {
-        "value.ownerId": DEFAULT_OWNER_ID,
-        "value.tier": DEFAULT_TIER,
-      },
-    },
-  );
+  return license?._id;
 };
 
 const mapLicenseResponse = (code: string, view: LicenseView) => ({
@@ -105,79 +53,63 @@ const mapLicenseResponse = (code: string, view: LicenseView) => ({
   valid: view.valid,
 });
 
-const regenerateDefaultLicense = async (previousCode?: string) => {
+type EnsuredDefaultLicense = {
+  code: string;
+  view: LicenseView;
+  created?: true;
+};
+
+const createDefaultLicense = async (): Promise<EnsuredDefaultLicense> => {
+  const code = await generateLicense(DEFAULT_OWNER_ID, DEFAULT_TIER);
+  const view = await viewLicense(code);
+  return {
+    code,
+    view,
+    created: true as const,
+  };
+};
+
+const regenerateDefaultLicense = async (
+  previousCode?: string,
+): Promise<EnsuredDefaultLicense> => {
   if (previousCode) {
-    await licenseCollection.deleteOne({ id: previousCode, type: "pluginsx_license" });
+    await License.deleteOne({ _id: previousCode });
+  }
+  return createDefaultLicense();
+};
+
+const ensureDefaultLicense = async (): Promise<EnsuredDefaultLicense> => {
+  const existingId = await findDefaultLicenseId();
+  if (!existingId) return createDefaultLicense();
+
+  if (!hasExpectedCodePrefix(existingId)) {
+    return regenerateDefaultLicense(existingId);
   }
 
-  try {
-    const code = await generateLicense(DEFAULT_OWNER_ID, DEFAULT_TIER);
-    const view = await viewLicense(code);
-    return {
-      code,
-      view,
-      created: true,
-    };
-  } catch (error) {
-    if (!isDuplicateKeyError(error)) throw error;
-
-    const duplicated = await findDefaultLicenseGift();
-    if (duplicated?.id) {
-      const duplicatedTier = resolveTierFromValue(duplicated.value);
-      await syncGiftDefaultTier(duplicated.id, duplicatedTier);
-
-      const view = await viewLicense(duplicated.id);
-      return {
-        code: duplicated.id,
-        view,
-        created: false,
-      };
-    }
-
-    // Quando a colisão não vier de owner duplicado (ex.: corrida em geração de código),
-    // tentamos gerar novamente uma única vez antes de falhar.
-    const retryCode = await generateLicense(DEFAULT_OWNER_ID, DEFAULT_TIER);
-    const retryView = await viewLicense(retryCode);
-    return {
-      code: retryCode,
-      view: retryView,
-      created: true,
-    };
+  const existingView = await viewLicense(existingId);
+  if (!existingView.valid) {
+    return regenerateDefaultLicense(existingId);
   }
+
+  return {
+    code: existingId,
+    view: existingView,
+  };
 };
 
 export const licenseRoutes = new Elysia({ prefix: "/license" })
   .post(
     "/generate",
     async () => {
-      await licenseOwnerIndexReady;
-
-      const existing = await findDefaultLicenseGift();
-
-      if (existing?.id) {
-        if (!hasExpectedCodePrefix(existing.id)) {
-          const regenerated = await regenerateDefaultLicense(existing.id);
-          return {
-            ...mapLicenseResponse(regenerated.code, regenerated.view),
-            created: regenerated.created,
-          };
-        }
-
-        const currentTier = resolveTierFromValue(existing.value);
-        await syncGiftDefaultTier(existing.id, currentTier);
-
-        const existingView = await viewLicense(existing.id);
+      const generated = await ensureDefaultLicense();
+      if (generated.created) {
         return {
-          ...mapLicenseResponse(existing.id, existingView),
-          created: false,
+          ...mapLicenseResponse(generated.code, generated.view),
+          created: true as const,
         };
       }
 
-      const generated = await regenerateDefaultLicense();
-      return {
-        ...mapLicenseResponse(generated.code, generated.view),
-        created: generated.created,
-      };
+      return mapLicenseResponse(generated.code, generated.view);
     },
     {
       detail: {
@@ -192,25 +124,18 @@ export const licenseRoutes = new Elysia({ prefix: "/license" })
   .get(
     "/view",
     async ({ status }) => {
-      await licenseOwnerIndexReady;
-
-      const license = await findDefaultLicenseGift();
-
-      if (!license?.id) {
+      const existingId = await findDefaultLicenseId();
+      if (!existingId) {
         return status(404, { message: "default license not found" });
       }
 
-      const currentTier = resolveTierFromValue(license.value);
-
-      if (!hasExpectedCodePrefix(license.id)) {
-        const regenerated = await regenerateDefaultLicense(license.id);
+      if (!hasExpectedCodePrefix(existingId)) {
+        const regenerated = await regenerateDefaultLicense(existingId);
         return mapLicenseResponse(regenerated.code, regenerated.view);
       }
 
-      await syncGiftDefaultTier(license.id, currentTier);
-
-      const licenseView = await viewLicense(license.id);
-      return mapLicenseResponse(license.id, licenseView);
+      const licenseView = await viewLicense(existingId);
+      return mapLicenseResponse(existingId, licenseView);
     },
     {
       detail: {
@@ -226,21 +151,20 @@ export const licenseRoutes = new Elysia({ prefix: "/license" })
   .get(
     "/verify",
     async ({ query, status }) => {
-      const code = typeof query.code === "string" ? query.code.trim() : "";
+      const key = typeof query.key === "string" ? query.key.trim() : "";
 
-      if (!code) {
-        return status(400, { message: "license code is required" });
+      if (!key) {
+        return status(400, { message: "license key is required" });
       }
 
-      const licenseView = await viewLicense(code);
-      return licenseView.valid;
+      return isLicenseValid(key);
     },
     {
       query: z.object({
-        code: z.string().min(1),
+        key: z.string().min(1),
       }),
       detail: {
-        summary: "Verify license by code",
+        summary: "Verify license by key",
         tags: ["License"],
       },
       response: {

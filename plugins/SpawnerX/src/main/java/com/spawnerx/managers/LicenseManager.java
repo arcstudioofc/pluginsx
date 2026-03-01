@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class LicenseManager {
 
-    private static final String VERIFY_ENDPOINT = "https://api-pluginsx.vercel.app/license/verify?code=";
+    private static final String VERIFY_ENDPOINT = "https://api-pluginsx.vercel.app/v2/license/verify?key=";
 
     public enum LicenseStatus {
         INVALID,
@@ -161,5 +161,5 @@ public class LicenseManager {
             return body;
         }
         return body.substring(0, 48) + "...";
-    }
+    }m
 }
