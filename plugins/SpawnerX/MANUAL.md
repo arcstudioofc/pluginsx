@@ -39,7 +39,7 @@ Se você deseja modificar o código-fonte e compilar sua própria versão do plu
     mvn clean package
     ```
 
-3.  **Localize o arquivo JAR**: Após a conclusão bem-sucedida do processo, o arquivo compilado do plugin, `SpawnerX-2.0.0.jar`, estará localizado na pasta `target/`.
+3.  **Localize o arquivo JAR**: Após a conclusão bem-sucedida do processo, o arquivo compilado do plugin, `SpawnerX-2.0.1.jar`, estará localizado na pasta `target/`.
 
 ### Fluxo de upgrade v2
 

@@ -1,4 +1,4 @@
-# SpawnerX v2.0.0
+# SpawnerX v2.0.1
 
 **SpawnerX** é um plugin completo para gerenciamento de spawners em servidores Bukkit/Paper do Minecraft 1.21. O plugin oferece controle total sobre a quebra, colocação e interação com spawners, com sistema de raridade configurável.
 
@@ -161,7 +161,7 @@ O arquivo de locale foi atualizado para incluir as mensagens do novo sistema de 
 mvn clean package
 ```
 
-O arquivo compilado estará em `target/SpawnerX-2.0.0.jar`.
+O arquivo compilado estará em `target/SpawnerX-2.0.1.jar`.
 
 ---
 
