@@ -161,5 +161,5 @@ public class LicenseManager {
             return body;
         }
         return body.substring(0, 48) + "...";
-    }m
+    }
 }
